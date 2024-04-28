@@ -8,4 +8,5 @@ type Employee struct {
 	LastName        string    `gorm:"type:text" json:"last_name"`
 	HashedPassword  string    `gorm:"type:text" json:"hashed_password"`
 	CurrentPosition string    `gorm:"type:text" json:"current_position"`
+	PositionID      uuid.UUID `gorm:"type:uuid" json:"position_id"`
 }

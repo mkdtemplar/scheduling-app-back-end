@@ -5,11 +5,16 @@ create table if not exists public.employees
     first_name       text,
     last_name        text,
     hashed_password  text,
-    current_position text
+    current_position text,
+    position_id      uuid
+        constraint position_id
+            references public.positions
 );
 
 alter table public.employees
     owner to postgres;
+
+
 
 create table if not exists public.positions
 (

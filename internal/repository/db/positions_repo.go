@@ -11,14 +11,14 @@ func NewPositionRepo() interfaces.IPositionsRepository {
 	return &PostgresDB{DB: GetDb()}
 }
 
-func (p *PostgresDB) CreatePosition(ctx context.Context, position *models.Position) (*models.Position, error) {
+func (p *PostgresDB) CreatePosition(ctx context.Context, position *models.Positions) (*models.Positions, error) {
 	if position == nil {
-		return &models.Position{}, errors.New("position is empty")
+		return &models.Positions{}, errors.New("position is empty")
 	}
 
 	err := p.DB.WithContext(ctx).Create(&position).Error
 	if err != nil {
-		return &models.Position{}, err
+		return &models.Positions{}, err
 	}
 	return position, nil
 }

@@ -6,10 +6,10 @@ import (
 	"github.com/google/uuid"
 )
 
-type Position struct {
+type Positions struct {
 	ID           uuid.UUID  `gorm:"type:uuid;primaryKey" json:"id"`
 	PositionName string     `json:"position_name" gorm:"type:text"`
-	Employees    []Employee `json:"employees"`
+	Employees    []Employee `gorm:"foreignKey:PositionID"`
 	Shifts       []string   `json:"shifts" gorm:"type:text[];serializer:json"`
 	StartTime    string     `json:"start_time" gorm:"type:varchar(10)"`
 	EndTime      string     `json:"end_time" gorm:"type:varchar(10)"`

@@ -6,5 +6,5 @@ import (
 )
 
 type IPositionsRepository interface {
-	CreatePosition(ctx context.Context, position *models.Position) (*models.Position, error)
+	CreatePosition(ctx context.Context, position *models.Positions) (*models.Positions, error)
 }

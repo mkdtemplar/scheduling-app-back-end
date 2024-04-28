@@ -12,14 +12,12 @@ import (
 )
 
 type createPositionRequest struct {
-	ID           uuid.UUID         `gorm:"type:uuid;primaryKey" json:"id"`
-	PositionName string            `json:"position_name" gorm:"type:text"`
-	Employees    []models.Employee `json:"employees" gorm:"type:text[];serializer:json"`
-	Shifts       []string          `json:"shifts" gorm:"type:text[];serializer:json"`
-	StartTime    string            `json:"start_time" gorm:"type:varchar(10)"`
-	EndTime      string            `json:"end_time" gorm:"type:varchar(10)"`
-	CreatedAt    time.Time         `json:"-" gorm:"type:timestamp"`
-	UpdatedAt    time.Time         `json:"-" gorm:"type:timestamp"`
+	ID           uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	PositionName string    `json:"position_name" gorm:"type:text"`
+	StartTime    string    `json:"start_time" gorm:"type:varchar(10)"`
+	EndTime      string    `json:"end_time" gorm:"type:varchar(10)"`
+	CreatedAt    time.Time `json:"-" gorm:"type:timestamp"`
+	UpdatedAt    time.Time `json:"-" gorm:"type:timestamp"`
 }
 
 func NewPositionHandler(IPositionRepository interfaces.IPositionsRepository) *PositionHandler {
@@ -35,10 +33,9 @@ func (i *PositionHandler) CreatePosition(ctx *gin.Context) {
 		return
 	}
 
-	arg := &models.Position{
+	arg := &models.Positions{
 		ID:           utils.GenerateID(),
 		PositionName: req.PositionName,
-		Shifts:       req.Shifts,
 		StartTime:    req.StartTime,
 		EndTime:      req.EndTime,
 		CreatedAt:    time.Now(),
