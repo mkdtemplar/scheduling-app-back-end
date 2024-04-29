@@ -21,9 +21,6 @@ func NewServer(config utils.Config) (*Server, error) {
 	return server, nil
 }
 
-var AdminHandlers api.AdminHandler
-var PositionsHandlers api.PositionHandler
-
 func (server *Server) InitServer() {
 	db.ConnectToPostgres()
 
@@ -31,16 +28,19 @@ func (server *Server) InitServer() {
 }
 
 func (server *Server) setupRouter() {
+	var adminHandlers api.UserHandler
+	var positionsHandlers api.PositionHandler
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
 	router.Use(middleware.CORSMiddleware())
 
-	adminHandler := AdminHandlers.AdminHandlerConstructor()
-	positionHandler := PositionsHandlers.PositionHandlerConstructor()
+	adminHandler := adminHandlers.AdminHandlerConstructor()
+	positionHandler := positionsHandlers.PositionHandlerConstructor()
 	router.GET("/")
 	router.POST("/admin/create", adminHandler.Create)
 	router.POST("/admin/position/create", positionHandler.CreatePosition)
+	router.GET("/admin/position/all-positions", positionHandler.AllPositions)
 
 	server.Router = router
 }

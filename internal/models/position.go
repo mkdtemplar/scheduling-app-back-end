@@ -7,12 +7,10 @@ import (
 )
 
 type Positions struct {
-	ID           uuid.UUID  `gorm:"type:uuid;primaryKey" json:"id"`
-	PositionName string     `json:"position_name" gorm:"type:text"`
-	Employees    []Employee `gorm:"foreignKey:PositionID"`
-	Shifts       []string   `json:"shifts" gorm:"type:text[];serializer:json"`
-	StartTime    string     `json:"start_time" gorm:"type:varchar(10)"`
-	EndTime      string     `json:"end_time" gorm:"type:varchar(10)"`
-	CreatedAt    time.Time  `json:"-" gorm:"type:timestamp"`
-	UpdatedAt    time.Time  `json:"-" gorm:"type:timestamp"`
+	ID           uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	PositionName string    `json:"position_name" gorm:"type:text"`
+	Users        []Users   `gorm:"foreignKey:PositionID;references:ID" json:"employees"`
+	Shifts       []Shifts  `gorm:"foreignKey:PositionID;references:ID" json:"shifts"`
+	CreatedAt    time.Time `json:"-" gorm:"type:timestamp"`
+	UpdatedAt    time.Time `json:"-" gorm:"type:timestamp"`
 }

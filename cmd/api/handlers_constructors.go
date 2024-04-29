@@ -2,10 +2,10 @@ package api
 
 import "scheduling-app-back-end/internal/repository/db"
 
-func (admin *AdminHandler) AdminHandlerConstructor() *AdminHandler {
+func (admin *UserHandler) AdminHandlerConstructor() *UserHandler {
 	adminRepo := db.NewAdminRepo()
 
-	return NewAdminHandler(adminRepo)
+	return NewUserHandler(adminRepo)
 }
 
 func (i *PositionHandler) PositionHandlerConstructor() *PositionHandler {

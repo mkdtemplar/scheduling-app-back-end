@@ -9,9 +9,9 @@ type Handler struct {
 	DB db.PostgresDB
 }
 
-type AdminHandler struct {
+type UserHandler struct {
 	Handler
-	interfaces.IAdminRepository
+	interfaces.IUserRepository
 }
 
 type PositionHandler struct {

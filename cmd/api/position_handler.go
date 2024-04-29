@@ -15,8 +15,6 @@ type createPositionRequest struct {
 	ID           uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
 	PositionName string    `json:"position_name" gorm:"type:text"`
 	StartTime    string    `json:"start_time" gorm:"type:varchar(10)"`
-	EndTime      string    `json:"end_time" gorm:"type:varchar(10)"`
-	CreatedAt    time.Time `json:"-" gorm:"type:timestamp"`
 	UpdatedAt    time.Time `json:"-" gorm:"type:timestamp"`
 }
 
@@ -36,8 +34,6 @@ func (i *PositionHandler) CreatePosition(ctx *gin.Context) {
 	arg := &models.Positions{
 		ID:           utils.GenerateID(),
 		PositionName: req.PositionName,
-		StartTime:    req.StartTime,
-		EndTime:      req.EndTime,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
@@ -49,4 +45,13 @@ func (i *PositionHandler) CreatePosition(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, newPosition)
+}
+
+func (i *PositionHandler) AllPositions(ctx *gin.Context) {
+	positions, err := i.IPositionsRepository.AllPositions(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, positions)
 }
