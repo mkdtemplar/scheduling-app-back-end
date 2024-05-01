@@ -20,15 +20,8 @@ func HashPassword(password string) (string, error) {
 func CheckPassword(password string, hashedPassword string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
-		switch {
-		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
-			// Invalid password
-			return false, errors.New("invalid credentials")
-		default:
-			return false, err
-		}
+		return false, errors.New("invalid credentials")
 	}
 
 	return true, nil
-
 }

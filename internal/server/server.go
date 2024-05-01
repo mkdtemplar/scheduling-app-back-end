@@ -29,16 +29,16 @@ func (server *Server) setupRouter() {
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
 
-	corsRoutes := router.Group("/", middleware.CORSMiddleware())
-
 	userHandler := userHandlers.AdminHandlerConstructor()
 	positionHandler := positionsHandlers.PositionHandlerConstructor()
 
-	corsRoutes.POST("/authenticate", userHandler.Authorization)
-	corsRoutes.GET("/")
-	corsRoutes.POST("/admin/create", userHandler.Create)
-	corsRoutes.POST("/admin/position/create", positionHandler.CreatePosition)
-	corsRoutes.GET("/admin/position/all-positions", positionHandler.AllPositions)
+	router.Use(middleware.CORSMiddleware())
+
+	router.POST("/authenticate", userHandler.Authorization)
+	router.GET("/")
+	router.POST("/admin/create", userHandler.Create)
+	router.POST("/admin/position/create", positionHandler.CreatePosition)
+	router.GET("/admin/position/all-positions", positionHandler.AllPositions)
 
 	server.Router = router
 }

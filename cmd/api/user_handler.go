@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"scheduling-app-back-end/internal/middleware"
 	"scheduling-app-back-end/internal/models"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func NewUserHandler(IUserRepository interfaces.IUserRepository, IJWTInterfaces middleware.IJWTInterfaces) *UserHandler {
@@ -108,13 +110,14 @@ func (user *UserHandler) Authorization(ctx *gin.Context) {
 	}
 
 	userFromDb, err := user.IUserRepository.GetUserByEmail(ctx, requestPayload.Email)
-	if err != nil {
-		ctx.JSON(http.StatusNotFound, errorResponse(err))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		ctx.JSON(http.StatusNotFound, errorResponse(errors.New("invalid credentials")))
+		return
 	}
 
 	valid, err := utils.CheckPassword(requestPayload.Password, userFromDb.Password)
 	if err != nil || !valid {
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
 		return
 	}
 
