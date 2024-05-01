@@ -14,11 +14,11 @@ type PostgresDB struct {
 	DB *gorm.DB
 }
 
-func NewAdminRepo() interfaces.IUserRepository {
+func NewUserRepo() interfaces.IUserRepository {
 	return &PostgresDB{DB: GetDb()}
 }
 
-func (p *PostgresDB) CreateAdmin(ctx context.Context, admin *models.Users) (*models.Users, error) {
+func (p *PostgresDB) CreateUser(ctx context.Context, admin *models.Users) (*models.Users, error) {
 	if admin == nil {
 		return &models.Users{}, errors.New("admin details empty")
 	}
@@ -29,4 +29,25 @@ func (p *PostgresDB) CreateAdmin(ctx context.Context, admin *models.Users) (*mod
 		return &models.Users{}, err
 	}
 	return admin, nil
+}
+
+func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.Users, error) {
+	user := &models.Users{}
+
+	err := p.DB.WithContext(ctx).Model(&models.Users{}).Where("email= ?", email).Take(&user).Error
+
+	userFind := &models.Users{
+		ID:              user.ID,
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
+		Email:           user.Email,
+		Password:        user.Password,
+		CurrentPosition: user.CurrentPosition,
+		Role:            user.Role,
+		Shifts:          user.Shifts,
+		CreatedAt:       user.CreatedAt,
+		UpdatedAt:       user.UpdatedAt,
+		PositionID:      user.PositionID,
+	}
+	return userFind, err
 }

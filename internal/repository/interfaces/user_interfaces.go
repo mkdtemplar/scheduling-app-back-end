@@ -6,5 +6,6 @@ import (
 )
 
 type IUserRepository interface {
-	CreateAdmin(ctx context.Context, admin *models.Users) (*models.Users, error)
+	CreateUser(ctx context.Context, admin *models.Users) (*models.Users, error)
+	GetUserByEmail(ctx context.Context, email string) (*models.Users, error)
 }

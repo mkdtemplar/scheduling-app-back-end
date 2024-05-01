@@ -1,6 +1,7 @@
 package api
 
 import (
+	"scheduling-app-back-end/internal/middleware"
 	"scheduling-app-back-end/internal/repository/db"
 	"scheduling-app-back-end/internal/repository/interfaces"
 )
@@ -12,6 +13,7 @@ type Handler struct {
 type UserHandler struct {
 	Handler
 	interfaces.IUserRepository
+	middleware.IJWTInterfaces
 }
 
 type PositionHandler struct {
