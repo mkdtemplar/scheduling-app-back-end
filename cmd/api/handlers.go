@@ -14,6 +14,7 @@ type UserHandler struct {
 	Handler
 	interfaces.IUserRepository
 	middleware.IJWTInterfaces
+	middleware.JwtUser
 }
 
 type PositionHandler struct {

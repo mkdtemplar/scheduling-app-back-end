@@ -110,14 +110,18 @@ func (user *UserHandler) Authorization(ctx *gin.Context) {
 	}
 
 	userFromDb, err := user.IUserRepository.GetUserByEmail(ctx, requestPayload.Email)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		ctx.JSON(http.StatusNotFound, errorResponse(errors.New("invalid credentials")))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("invalid credentials")))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
 	valid, err := utils.CheckPassword(requestPayload.Password, userFromDb.Password)
 	if err != nil || !valid {
-		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
@@ -130,7 +134,7 @@ func (user *UserHandler) Authorization(ctx *gin.Context) {
 
 	tokens, err := user.IJWTInterfaces.GenerateTokenPairs(&testUser)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("invalid credentials")))
 		return
 	}
 

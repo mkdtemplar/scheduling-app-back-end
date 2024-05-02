@@ -7,6 +7,7 @@ import (
 	"scheduling-app-back-end/internal/repository/interfaces"
 	"scheduling-app-back-end/internal/utils"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -35,6 +36,9 @@ func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.
 	user := &models.Users{}
 
 	err := p.DB.WithContext(ctx).Model(&models.Users{}).Where("email= ?", email).Take(&user).Error
+	if err != nil {
+		return &models.Users{}, err
+	}
 
 	userFind := &models.Users{
 		ID:              user.ID,
@@ -49,5 +53,28 @@ func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.
 		UpdatedAt:       user.UpdatedAt,
 		PositionID:      user.PositionID,
 	}
-	return userFind, err
+	return userFind, nil
+}
+
+func (p *PostgresDB) GetUserById(ctx context.Context, id uuid.UUID) (*models.Users, error) {
+	user := &models.Users{}
+	err := p.DB.WithContext(ctx).Model(&models.Users{}).Where("id = ?", id).Take(&user).Error
+	if err != nil {
+		return &models.Users{}, err
+	}
+	userFind := &models.Users{
+		ID:              user.ID,
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
+		Email:           user.Email,
+		Password:        user.Password,
+		CurrentPosition: user.CurrentPosition,
+		Role:            user.Role,
+		Shifts:          user.Shifts,
+		CreatedAt:       user.CreatedAt,
+		UpdatedAt:       user.UpdatedAt,
+		PositionID:      user.PositionID,
+	}
+
+	return userFind, nil
 }

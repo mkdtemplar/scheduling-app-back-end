@@ -29,12 +29,14 @@ func (server *Server) setupRouter() {
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
 
-	userHandler := userHandlers.AdminHandlerConstructor()
+	userHandler := userHandlers.UserHandlerConstructor()
 	positionHandler := positionsHandlers.PositionHandlerConstructor()
 
 	router.Use(middleware.CORSMiddleware())
 
 	router.POST("/authenticate", userHandler.Authorization)
+	router.GET("/refresh", userHandler.RefreshToken)
+	router.GET("/logout", userHandler.Logout)
 	router.GET("/")
 	router.POST("/admin/create", userHandler.Create)
 	router.POST("/admin/position/create", positionHandler.CreatePosition)

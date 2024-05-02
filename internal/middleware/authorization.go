@@ -1,7 +1,11 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
+	"log"
+	"net/http"
+	"scheduling-app-back-end/internal/repository/db"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -92,4 +96,56 @@ func (j *Authorization) GetRefreshCookie(refreshToken string, ctx *gin.Context) 
 
 func (j *Authorization) GetExpiredRefreshCookie(ctx *gin.Context) {
 	ctx.SetCookie(j.CookieName, "", 0, j.CookiePath, j.CookieDomain, true, true)
+}
+
+func (j *Authorization) RefreshToken(ctx *gin.Context) {
+	userRepo := db.NewUserRepo()
+	for _, cookie := range ctx.Request.Cookies() {
+		if cookie.Name == j.CookieName {
+			claims := &Claims{}
+			refreshToken := cookie.Value
+
+			_, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
+				return []byte(j.JWTSecret), nil
+			})
+			if err != nil {
+				ctx.JSON(http.StatusUnauthorized, gin.H{"error": errors.New("unauthorized")})
+				return
+			}
+
+			userId, err := uuid.Parse(claims.Subject)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": errors.New("cannot parse id")})
+			}
+			user, err := userRepo.GetUserById(ctx, userId)
+			if err != nil {
+				ctx.JSON(http.StatusUnauthorized, gin.H{"error": errors.New("user not found")})
+				return
+			}
+			log.Println(user)
+
+			u := &JwtUser{
+				ID:        user.ID,
+				FirstName: user.FirstName,
+				LastName:  user.LastName,
+				Email:     user.Email,
+			}
+
+			tokenPairs, err := j.GenerateTokenPairs(u)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": errors.New("cannot generate tokens")})
+				return
+			}
+
+			ctx.SetCookie(j.CookieName, tokenPairs.RefreshToken, int(j.RefreshExpiry.Seconds()), j.CookiePath, j.CookieDomain, true, true)
+
+			ctx.JSON(http.StatusOK, tokenPairs)
+
+		}
+	}
+}
+
+func (j *Authorization) Logout(ctx *gin.Context) {
+	ctx.SetCookie(j.CookieName, "", -1, j.CookiePath, j.CookieDomain, true, true)
+	ctx.Writer.WriteHeader(http.StatusAccepted)
 }
