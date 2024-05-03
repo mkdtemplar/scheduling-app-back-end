@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"scheduling-app-back-end/internal/repository/db"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -91,10 +92,12 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 }
 
 func (j *Authorization) GetRefreshCookie(refreshToken string, ctx *gin.Context) {
+	ctx.SetSameSite(http.SameSiteStrictMode)
 	ctx.SetCookie(j.CookieName, refreshToken, int(j.RefreshExpiry.Seconds()), j.CookiePath, j.CookieDomain, true, true)
 }
 
 func (j *Authorization) GetExpiredRefreshCookie(ctx *gin.Context) {
+
 	ctx.SetCookie(j.CookieName, "", 0, j.CookiePath, j.CookieDomain, true, true)
 }
 
@@ -137,6 +140,7 @@ func (j *Authorization) RefreshToken(ctx *gin.Context) {
 				return
 			}
 
+			ctx.SetSameSite(http.SameSiteStrictMode)
 			ctx.SetCookie(j.CookieName, tokenPairs.RefreshToken, int(j.RefreshExpiry.Seconds()), j.CookiePath, j.CookieDomain, true, true)
 
 			ctx.JSON(http.StatusOK, tokenPairs)
@@ -146,6 +150,59 @@ func (j *Authorization) RefreshToken(ctx *gin.Context) {
 }
 
 func (j *Authorization) Logout(ctx *gin.Context) {
+	ctx.SetSameSite(http.SameSiteStrictMode)
 	ctx.SetCookie(j.CookieName, "", -1, j.CookiePath, j.CookieDomain, true, true)
 	ctx.Writer.WriteHeader(http.StatusAccepted)
+}
+
+func (j *Authorization) GetTokenFromHeaderAndVerify(ctx *gin.Context) (string, *Claims, error) {
+	ctx.Writer.Header().Add("Vary", "Authorization")
+
+	authHeader := ctx.Request.Header.Get("Authorization")
+	if authHeader == "" {
+		return "", nil, errors.New("authorization header is missing")
+	}
+
+	headerParts := strings.Split(authHeader, " ")
+	if len(headerParts) != 2 {
+		return "", nil, errors.New("authorization header is invalid")
+	}
+
+	if headerParts[0] != "Bearer" {
+		return "", nil, errors.New("authorization header is invalid")
+	}
+
+	token := headerParts[1]
+
+	claims := &Claims{}
+
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(j.JWTSecret), nil
+	})
+	if err != nil {
+		if strings.HasPrefix(err.Error(), "token is expired by") {
+			return "", nil, errors.New("token is expired")
+		}
+		return "", nil, err
+	}
+
+	if claims.Issuer != j.Issuer {
+		return "", nil, errors.New("invalid issuer")
+	}
+
+	return token, claims, nil
+}
+
+func (j *Authorization) AuthRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		_, _, err := j.GetTokenFromHeaderAndVerify(c)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+		c.Next()
+	}
 }

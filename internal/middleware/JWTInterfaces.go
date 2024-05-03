@@ -10,4 +10,6 @@ type IJWTInterfaces interface {
 	GetExpiredRefreshCookie(ctx *gin.Context)
 	RefreshToken(ctx *gin.Context)
 	Logout(ctx *gin.Context)
+	GetTokenFromHeaderAndVerify(ctx *gin.Context) (string, *Claims, error)
+	AuthRequired() gin.HandlerFunc
 }

@@ -38,9 +38,12 @@ func (server *Server) setupRouter() {
 	router.GET("/refresh", userHandler.RefreshToken)
 	router.GET("/logout", userHandler.Logout)
 	router.GET("/")
-	router.POST("/admin/create", userHandler.Create)
-	router.POST("/admin/position/create", positionHandler.CreatePosition)
-	router.GET("/admin/position/all-positions", positionHandler.AllPositions)
+
+	authRoutes := router.Group("/admin").Use(userHandler.IJWTInterfaces.AuthRequired())
+
+	authRoutes.POST("/add-user", userHandler.Create)
+	authRoutes.POST("/position/add-position", positionHandler.CreatePosition)
+	authRoutes.GET("/position/all-positions", positionHandler.AllPositions)
 
 	server.Router = router
 }
