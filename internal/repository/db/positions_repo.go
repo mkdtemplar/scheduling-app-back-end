@@ -26,9 +26,12 @@ func (p *PostgresDB) CreatePosition(ctx context.Context, position *models.Positi
 func (p *PostgresDB) AllPositions(ctx context.Context) ([]*models.Positions, error) {
 	var positions []*models.Positions
 
-	if err := p.DB.WithContext(ctx).Find(&positions).Error; err != nil {
+	if err := p.DB.WithContext(ctx).Model(&models.Positions{}).Preload("Users").Find(&positions).Error; err != nil {
 		return []*models.Positions{}, err
 	}
+	//if err := p.DB.WithContext(ctx).Find(&positions).Error; err != nil {
+	//	return []*models.Positions{}, err
+	//}
 
 	return positions, nil
 }
