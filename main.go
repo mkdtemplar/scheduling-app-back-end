@@ -7,8 +7,6 @@ import (
 	"scheduling-app-back-end/internal/utils"
 )
 
-const port = 8080
-
 func main() {
 
 	config, err := utils.LoadConfig(".")

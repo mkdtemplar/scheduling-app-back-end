@@ -55,3 +55,14 @@ func (i *PositionHandler) AllPositions(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, positions)
 }
+
+func (i *PositionHandler) GetPositionById(ctx *gin.Context) {
+	id := uuid.MustParse(ctx.Params.ByName("id"))
+
+	position, err := i.IPositionsRepository.GetPositionByID(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusNoContent, errorResponse(err))
+	}
+
+	ctx.JSON(http.StatusOK, position)
+}
