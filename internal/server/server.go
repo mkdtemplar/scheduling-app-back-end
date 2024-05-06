@@ -38,13 +38,14 @@ func (server *Server) setupRouter() {
 	router.GET("/refresh", userHandler.RefreshToken)
 	router.GET("/logout", userHandler.Logout)
 	router.GET("/")
+	router.GET("/positions", positionHandler.AllPositions)
+	router.GET("/position/:id", positionHandler.GetPositionById)
+	router.GET("/all-users", userHandler.AllUsers)
 
 	authRoutes := router.Group("/admin").Use(userHandler.IJWTInterfaces.AuthRequired())
-
 	authRoutes.POST("/add-user", userHandler.Create)
-	authRoutes.POST("/position/add-position", positionHandler.CreatePosition)
-	authRoutes.GET("/position/all-positions", positionHandler.AllPositions)
-	authRoutes.GET("/position/:id", positionHandler.GetPositionById)
+	authRoutes.POST("/add-position", positionHandler.CreatePosition)
+	authRoutes.GET("/edit-position/:id", positionHandler.GetPositionByIdForEdit)
 
 	server.Router = router
 }

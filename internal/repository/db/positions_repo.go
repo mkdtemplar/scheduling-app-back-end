@@ -5,8 +5,6 @@ import (
 	"errors"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/repository/interfaces"
-
-	"github.com/google/uuid"
 )
 
 func NewPositionRepo() interfaces.IPositionsRepository {
@@ -35,11 +33,26 @@ func (p *PostgresDB) AllPositions(ctx context.Context) ([]*models.Positions, err
 	return positions, nil
 }
 
-func (p *PostgresDB) GetPositionByID(ctx context.Context, id uuid.UUID) (*models.Positions, error) {
+func (p *PostgresDB) GetPositionByID(ctx context.Context, id int64) (*models.Positions, error) {
 	position := &models.Positions{}
 	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Find(&position).Error; err != nil {
 		return &models.Positions{}, err
 	}
+
+	return position, nil
+}
+
+func (p *PostgresDB) GetPositionByIdForEdit(ctx context.Context, id int64) (*models.Positions, error) {
+	position := &models.Positions{}
+	var usersArray []int64
+	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Find(&position).Error; err != nil {
+		return &models.Positions{}, err
+	}
+
+	for _, user := range position.Users {
+		usersArray = append(usersArray, user.ID)
+	}
+	position.UsersArray = usersArray
 
 	return position, nil
 }

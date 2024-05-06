@@ -6,12 +6,12 @@ import (
 	"log"
 	"net/http"
 	"scheduling-app-back-end/internal/repository/db"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 )
 
 type Authorization struct {
@@ -40,10 +40,10 @@ func NewAuthorization(issuer string, audience string, secret string, tokenExpiry
 }
 
 type JwtUser struct {
-	ID        uuid.UUID `json:"id" db:"id" gorm:"type:uuid"`
-	FirstName string    `json:"first_name" db:"first_name" gorm:"type:varchar(55)"`
-	LastName  string    `json:"last_name" db:"last_name" gorm:"type:varchar(55)"`
-	Email     string    `json:"email" db:"email" gorm:"type:varchar(255)"`
+	ID        int64  `json:"id" db:"id" gorm:"type:bigserial"`
+	FirstName string `json:"first_name" db:"first_name" gorm:"type:varchar(55)"`
+	LastName  string `json:"last_name" db:"last_name" gorm:"type:varchar(55)"`
+	Email     string `json:"email" db:"email" gorm:"type:varchar(255)"`
 }
 
 type TokenPairs struct {
@@ -60,7 +60,7 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 
 	claims := token.Claims.(jwt.MapClaims)
 	claims["name"] = fmt.Sprintf("%s %s", user.FirstName, user.LastName)
-	claims["sub"] = user.ID.String()
+	claims["sub"] = strconv.Itoa(int(user.ID))
 	claims["aud"] = j.Audience
 	claims["iss"] = j.Issuer
 	claims["iat"] = time.Now().UTC().Unix()
@@ -75,7 +75,7 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 
 	refreshToken := jwt.New(jwt.SigningMethodHS256)
 	refreshTokenClaims := refreshToken.Claims.(jwt.MapClaims)
-	refreshTokenClaims["sub"] = user.ID.String()
+	refreshTokenClaims["sub"] = strconv.Itoa(int(user.ID))
 	refreshTokenClaims["iat"] = time.Now().UTC().Unix()
 	refreshTokenClaims["ext"] = time.Now().Add(j.RefreshExpiry).UTC().Unix()
 
@@ -116,11 +116,11 @@ func (j *Authorization) RefreshToken(ctx *gin.Context) {
 				return
 			}
 
-			userId, err := uuid.Parse(claims.Subject)
+			userId, err := strconv.Atoi(claims.Subject)
 			if err != nil {
 				ctx.JSON(http.StatusBadRequest, gin.H{"error": errors.New("cannot parse id")})
 			}
-			user, err := userRepo.GetUserById(ctx, userId)
+			user, err := userRepo.GetUserById(ctx, int64(userId))
 			if err != nil {
 				ctx.JSON(http.StatusUnauthorized, gin.H{"error": errors.New("user not found")})
 				return

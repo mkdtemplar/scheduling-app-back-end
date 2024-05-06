@@ -5,9 +5,8 @@ import (
 	"errors"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/repository/interfaces"
-	"scheduling-app-back-end/internal/utils"
 
-	"github.com/google/uuid"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -23,7 +22,6 @@ func (p *PostgresDB) CreateUser(ctx context.Context, admin *models.Users) (*mode
 	if admin == nil {
 		return &models.Users{}, errors.New("admin details empty")
 	}
-	admin.ID = utils.GenerateID()
 
 	err := p.DB.WithContext(ctx).Model(&models.Users{}).Create(&admin).Error
 	if err != nil {
@@ -56,7 +54,7 @@ func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.
 	return userFind, nil
 }
 
-func (p *PostgresDB) GetUserById(ctx context.Context, id uuid.UUID) (*models.Users, error) {
+func (p *PostgresDB) GetUserById(ctx context.Context, id int64) (*models.Users, error) {
 	user := &models.Users{}
 	err := p.DB.WithContext(ctx).Model(&models.Users{}).Where("id = ?", id).Take(&user).Error
 	if err != nil {
@@ -77,4 +75,13 @@ func (p *PostgresDB) GetUserById(ctx context.Context, id uuid.UUID) (*models.Use
 	}
 
 	return userFind, nil
+}
+
+func (p *PostgresDB) AllUsers(ctx *gin.Context) ([]*models.Users, error) {
+	var users []*models.Users
+	err := p.DB.WithContext(ctx).Model(&models.Users{}).Preload("Shifts").Find(&users).Error
+	if err != nil {
+		return []*models.Users{}, err
+	}
+	return users, nil
 }

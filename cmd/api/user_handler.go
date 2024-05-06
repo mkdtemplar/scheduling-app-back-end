@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -22,7 +21,7 @@ func NewUserHandler(IUserRepository interfaces.IUserRepository, IJWTInterfaces m
 }
 
 type createUserRequest struct {
-	ID              uuid.UUID   `gorm:"type:uuid;primaryKey" json:"id"`
+	ID              int64       `gorm:"type:bigint;primaryKey" json:"id"`
 	FirstName       string      `gorm:"type:text" json:"first_name" binding:"required"`
 	LastName        string      `gorm:"type:text" json:"last_name" binding:"required"`
 	Email           string      `gorm:"type:text" json:"email" binding:"required,email"`
@@ -31,32 +30,30 @@ type createUserRequest struct {
 	Role            models.Role `sql:"type:user_role" db:"role" json:"role" binding:"required"`
 	CreatedAt       time.Time   `gorm:"type:timestamp" json:"-"`
 	UpdatedAt       time.Time   `gorm:"type:timestamp" json:"-"`
-	PositionID      uuid.UUID   `gorm:"type:uuid" json:"position_id"`
+	PositionID      int64       `gorm:"type:bigint" json:"position_id"`
 }
 
-type createUserResponse struct {
-	ID                uuid.UUID   `gorm:"type:uuid;primaryKey" json:"id"`
+type CreateUserResponse struct {
+	ID                int64       `gorm:"type:bigint;primaryKey" json:"id"`
 	FirstName         string      `gorm:"type:text" json:"first_name" binding:"required"`
 	LastName          string      `gorm:"type:text" json:"last_name" binding:"required"`
 	Email             string      `gorm:"type:text" json:"email" binding:"required,email"`
 	CurrentPosition   string      `gorm:"type:text" json:"current_position" binding:"required"`
 	Role              models.Role `sql:"type:user_role" db:"role" json:"role" binding:"required"`
-	PasswordChangedAt time.Time   `json:"password_changed_at"`
+	PasswordChangedAt time.Time   `json:"password_changed_at,omitempty"`
 	CreatedAt         time.Time   `gorm:"type:timestamp" json:"-"`
-	PositionID        uuid.UUID   `gorm:"type:uuid" json:"position_id"`
+	PositionID        int64       `gorm:"type:bigint" json:"position_id"`
 }
 
-func newUserResponse(user *models.Users) *createUserResponse {
-	return &createUserResponse{
-		ID:                user.ID,
-		FirstName:         user.FirstName,
-		LastName:          user.LastName,
-		Email:             user.Email,
-		CurrentPosition:   user.CurrentPosition,
-		Role:              user.Role,
-		PositionID:        user.PositionID,
-		PasswordChangedAt: time.Now().UTC(),
-		CreatedAt:         time.Now().UTC(),
+func NewUserResponse(user *models.Users) *CreateUserResponse {
+	return &CreateUserResponse{
+		ID:              user.ID,
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
+		Email:           user.Email,
+		CurrentPosition: user.CurrentPosition,
+		Role:            user.Role,
+		PositionID:      user.PositionID,
 	}
 }
 
@@ -74,7 +71,6 @@ func (user *UserHandler) Create(ctx *gin.Context) {
 	}
 
 	arg := &models.Users{
-		ID:              utils.GenerateID(),
 		FirstName:       req.FirstName,
 		LastName:        req.LastName,
 		Email:           req.Email,
@@ -93,8 +89,25 @@ func (user *UserHandler) Create(ctx *gin.Context) {
 		return
 	}
 
-	response := newUserResponse(newUser)
+	response := NewUserResponse(newUser)
 	ctx.JSON(http.StatusCreated, response)
+}
+
+func (user *UserHandler) AllUsers(ctx *gin.Context) {
+
+	var allUsers []*CreateUserResponse
+
+	users, err := user.IUserRepository.AllUsers(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	for _, u := range users {
+		i := NewUserResponse(u)
+		allUsers = append(allUsers, i)
+	}
+
+	ctx.JSON(http.StatusOK, allUsers)
 }
 
 func (user *UserHandler) Authorization(ctx *gin.Context) {
