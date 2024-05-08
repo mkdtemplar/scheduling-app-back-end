@@ -1,4 +1,4 @@
-create table if not exists public.employees
+create table if not exists public.users
 (
     id               uuid not null
         primary key,
