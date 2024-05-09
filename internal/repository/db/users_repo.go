@@ -40,8 +40,7 @@ func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.
 
 	userFind := &models.Users{
 		ID:              user.ID,
-		FirstName:       user.FirstName,
-		LastName:        user.LastName,
+		NameSurname:     user.NameSurname,
 		Email:           user.Email,
 		Password:        user.Password,
 		CurrentPosition: user.CurrentPosition,
@@ -62,8 +61,7 @@ func (p *PostgresDB) GetUserById(ctx context.Context, id int64) (*models.Users, 
 	}
 	userFind := &models.Users{
 		ID:              user.ID,
-		FirstName:       user.FirstName,
-		LastName:        user.LastName,
+		NameSurname:     user.NameSurname,
 		Email:           user.Email,
 		Password:        user.Password,
 		CurrentPosition: user.CurrentPosition,
