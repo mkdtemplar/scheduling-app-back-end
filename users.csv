@@ -1,0 +1,3 @@
+id,first_name,last_name,email,password,current_position,role,created_at,updated_at,position_id
+1,Thor,Thunderbolt,thor@example.com,$2a$10$Lt4EkWZ25EMtpJpTx79.re.WivE7ui56rJPCKQ.J5Kkzsj5fOdWsm,God of Tunder,admin,2024-05-06 14:16:23.302233,2024-05-06 14:16:23.302233,1
+2,Admin,User,admin@example.com,$2a$10$XEtotkDkvQRU/moEVKxpqONvaPD0iAxjrzdeeMllETqEZOHcfbPXG,Administrator,admin,2024-05-06 14:17:27.377927,2024-05-06 14:17:27.377927,2
