@@ -1,7 +1,7 @@
 package server
 
 import (
-	"scheduling-app-back-end/cmd/api"
+	"scheduling-app-back-end/api"
 	"scheduling-app-back-end/internal/middleware"
 	"scheduling-app-back-end/internal/utils"
 
@@ -43,8 +43,8 @@ func (server *Server) setupRouter() {
 	router.GET("/all-users", userHandler.AllUsers)
 
 	authRoutes := router.Group("/admin").Use(userHandler.IJWTInterfaces.AuthRequired())
-	authRoutes.POST("/add-user", userHandler.Create)
-	authRoutes.POST("/add-position", positionHandler.CreatePosition)
+	authRoutes.PUT("/add-user", userHandler.Create)
+	authRoutes.PUT("/add-position/0", positionHandler.CreatePosition)
 	authRoutes.GET("/edit-position/:id", positionHandler.GetPositionByIdForEdit)
 
 	server.Router = router

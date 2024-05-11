@@ -21,7 +21,7 @@ func NewUserHandler(IUserRepository interfaces.IUserRepository, IJWTInterfaces m
 }
 
 type createUserRequest struct {
-	ID              int64       `gorm:"type:bigint;primaryKey" json:"id"`
+	ID              int64       `gorm:"type:bigint;primaryKey" json:"id,string" binding:"required"`
 	NameSurname     string      `gorm:"type:text" json:"name_surname" binding:"required"`
 	Email           string      `gorm:"type:text" json:"email" binding:"required,email"`
 	Password        string      `gorm:"type:text" json:"password" binding:"required"`
@@ -29,18 +29,18 @@ type createUserRequest struct {
 	Role            models.Role `sql:"type:user_role" db:"role" json:"role" binding:"required"`
 	CreatedAt       time.Time   `gorm:"type:timestamp" json:"-"`
 	UpdatedAt       time.Time   `gorm:"type:timestamp" json:"-"`
-	PositionID      int64       `gorm:"type:bigint" json:"position_id"`
+	PositionID      int64       `gorm:"type:bigint" json:"position_id,string" binding:"required"`
 }
 
 type CreateUserResponse struct {
-	ID                int64       `gorm:"type:bigint;primaryKey" json:"id"`
+	ID                int64       `gorm:"type:bigint;primaryKey" json:"id,string"`
 	NameSurname       string      `gorm:"type:text" json:"name_surname" binding:"required"`
 	Email             string      `gorm:"type:text" json:"email" binding:"required,email"`
 	CurrentPosition   string      `gorm:"type:text" json:"current_position" binding:"required"`
 	Role              models.Role `sql:"type:user_role" db:"role" json:"role" binding:"required"`
 	PasswordChangedAt time.Time   `json:"password_changed_at,omitempty"`
 	CreatedAt         time.Time   `gorm:"type:timestamp" json:"-"`
-	PositionID        int64       `gorm:"type:bigint" json:"position_id"`
+	PositionID        int64       `gorm:"type:bigint" json:"position_id,string"`
 }
 
 func NewUserResponse(user *models.Users) *CreateUserResponse {
@@ -68,6 +68,7 @@ func (user *UserHandler) Create(ctx *gin.Context) {
 	}
 
 	arg := &models.Users{
+		ID:              req.ID,
 		NameSurname:     req.NameSurname,
 		Email:           req.Email,
 		Password:        hashedPassword,

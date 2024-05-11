@@ -18,16 +18,16 @@ func NewUserRepo() interfaces.IUserRepository {
 	return &PostgresDB{DB: GetDb()}
 }
 
-func (p *PostgresDB) CreateUser(ctx context.Context, admin *models.Users) (*models.Users, error) {
-	if admin == nil {
-		return &models.Users{}, errors.New("admin details empty")
+func (p *PostgresDB) CreateUser(ctx context.Context, user *models.Users) (*models.Users, error) {
+	if user == nil {
+		return &models.Users{}, errors.New("user details empty")
 	}
 
-	err := p.DB.WithContext(ctx).Model(&models.Users{}).Create(&admin).Error
+	err := p.DB.WithContext(ctx).Model(&models.Users{}).Create(&user).Error
 	if err != nil {
 		return &models.Users{}, err
 	}
-	return admin, nil
+	return user, nil
 }
 
 func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.Users, error) {
