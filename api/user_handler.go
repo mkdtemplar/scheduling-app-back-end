@@ -22,7 +22,8 @@ func NewUserHandler(IUserRepository interfaces.IUserRepository, IJWTInterfaces m
 
 type createUserRequest struct {
 	ID              int64       `gorm:"type:bigint;primaryKey" json:"id,string" binding:"required"`
-	NameSurname     string      `gorm:"type:text" json:"name_surname" binding:"required"`
+	FirstName       string      `gorm:"type:text" json:"first_name" binding:"required"`
+	LastName        string      `gorm:"type:text" json:"last_name" binding:"required"`
 	Email           string      `gorm:"type:text" json:"email" binding:"required,email"`
 	Password        string      `gorm:"type:text" json:"password" binding:"required"`
 	CurrentPosition string      `gorm:"type:text" json:"current_position" binding:"required"`
@@ -34,7 +35,8 @@ type createUserRequest struct {
 
 type CreateUserResponse struct {
 	ID                int64       `gorm:"type:bigint;primaryKey" json:"id,string"`
-	NameSurname       string      `gorm:"type:text" json:"name_surname" binding:"required"`
+	FirstName         string      `gorm:"type:text" json:"first_name" binding:"required"`
+	LastName          string      `gorm:"type:text" json:"last_name" binding:"required"`
 	Email             string      `gorm:"type:text" json:"email" binding:"required,email"`
 	CurrentPosition   string      `gorm:"type:text" json:"current_position" binding:"required"`
 	Role              models.Role `sql:"type:user_role" db:"role" json:"role" binding:"required"`
@@ -46,7 +48,8 @@ type CreateUserResponse struct {
 func NewUserResponse(user *models.Users) *CreateUserResponse {
 	return &CreateUserResponse{
 		ID:              user.ID,
-		NameSurname:     user.NameSurname,
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
 		Email:           user.Email,
 		CurrentPosition: user.CurrentPosition,
 		Role:            user.Role,
@@ -69,7 +72,8 @@ func (user *UserHandler) Create(ctx *gin.Context) {
 
 	arg := &models.Users{
 		ID:              req.ID,
-		NameSurname:     req.NameSurname,
+		FirstName:       req.FirstName,
+		LastName:        req.LastName,
 		Email:           req.Email,
 		Password:        hashedPassword,
 		CurrentPosition: req.CurrentPosition,
@@ -136,9 +140,10 @@ func (user *UserHandler) Authorization(ctx *gin.Context) {
 	}
 
 	testUser := middleware.JwtUser{
-		ID:          userFromDb.ID,
-		NameSurname: userFromDb.NameSurname,
-		Email:       userFromDb.Email,
+		ID:        userFromDb.ID,
+		FirstName: userFromDb.FirstName,
+		LastName:  userFromDb.LastName,
+		Email:     userFromDb.Email,
 	}
 
 	tokens, err := user.IJWTInterfaces.GenerateTokenPairs(&testUser)

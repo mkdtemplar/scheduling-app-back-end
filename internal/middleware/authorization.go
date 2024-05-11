@@ -40,9 +40,10 @@ func NewAuthorization(issuer string, audience string, secret string, tokenExpiry
 }
 
 type JwtUser struct {
-	ID          int64  `json:"id" db:"id" gorm:"type:bigserial"`
-	NameSurname string `gorm:"type:text" json:"name_surname" binding:"required"`
-	Email       string `json:"email" db:"email" gorm:"type:varchar(255)"`
+	ID        int64  `json:"id" db:"id" gorm:"type:bigserial"`
+	FirstName string `gorm:"type:text" json:"first_name" binding:"required"`
+	LastName  string `gorm:"type:text" json:"last_name" binding:"required"`
+	Email     string `json:"email" db:"email" gorm:"type:varchar(255)"`
 }
 
 type TokenPairs struct {
@@ -58,7 +59,7 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = user.NameSurname
+	claims["name"] = fmt.Sprintf("%s%s", user.FirstName, user.LastName)
 	claims["sub"] = strconv.Itoa(int(user.ID))
 	claims["aud"] = j.Audience
 	claims["iss"] = j.Issuer
@@ -127,9 +128,10 @@ func (j *Authorization) RefreshToken(ctx *gin.Context) {
 			log.Println(user)
 
 			u := &JwtUser{
-				ID:          user.ID,
-				NameSurname: user.NameSurname,
-				Email:       user.Email,
+				ID:        user.ID,
+				FirstName: user.FirstName,
+				LastName:  user.LastName,
+				Email:     user.Email,
 			}
 
 			tokenPairs, err := j.GenerateTokenPairs(u)
