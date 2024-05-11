@@ -84,3 +84,34 @@ func (p *PostgresDB) AllUsers(ctx *gin.Context) ([]*models.Users, error) {
 	}
 	return users, nil
 }
+
+func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.Users, error) {
+	user := &models.Users{}
+
+	positions, err := p.AllPositions(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = p.DB.WithContext(ctx).Model(&models.Users{}).Where("id = ?", id).Take(&user).Error
+	if err != nil {
+		return &models.Users{}, err
+	}
+	userFind := &models.Users{
+		ID:              user.ID,
+		FirstName:       user.FirstName,
+		LastName:        user.LastName,
+		Email:           user.Email,
+		Password:        user.Password,
+		CurrentPosition: user.CurrentPosition,
+		Role:            user.Role,
+		Shifts:          user.Shifts,
+		CreatedAt:       user.CreatedAt,
+		UpdatedAt:       user.UpdatedAt,
+		PositionID:      user.PositionID,
+	}
+
+	for _, position := range positions {
+		userFind.UserPositionArray = append(userFind.UserPositionArray, position.ID)
+	}
+	return userFind, nil
+}

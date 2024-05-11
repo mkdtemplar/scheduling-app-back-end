@@ -7,6 +7,7 @@ import (
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/repository/interfaces"
 	"scheduling-app-back-end/internal/utils"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -111,6 +112,24 @@ func (user *UserHandler) AllUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, allUsers)
 }
 
+func (user *UserHandler) GetUserById(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	userById, err := user.IUserRepository.GetUserById(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusNoContent, errorResponse(err))
+		return
+	}
+
+	response := NewUserResponse(userById)
+
+	ctx.JSON(http.StatusOK, response)
+}
+
 func (user *UserHandler) Authorization(ctx *gin.Context) {
 
 	var requestPayload struct {
@@ -156,6 +175,21 @@ func (user *UserHandler) Authorization(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusAccepted, tokens)
 
+}
+
+func (user *UserHandler) GetUserByIdForEdit(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	userForEdit, err := user.IUserRepository.GetUserByIdForEdit(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, userForEdit)
 }
 
 func errorResponse(err error) gin.H {

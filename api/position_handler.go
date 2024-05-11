@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/repository/interfaces"
@@ -100,8 +99,6 @@ func (i *PositionHandler) GetPositionById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-
-	fmt.Println(req.ID)
 
 	position, err := i.IPositionsRepository.GetPositionByID(ctx, req.ID)
 	if err != nil {

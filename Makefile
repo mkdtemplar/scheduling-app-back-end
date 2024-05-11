@@ -8,7 +8,7 @@ migratecreate:
 	migrate create -ext sql -dir internal/repository/migrations/ -seq init_schema
 
 migrateup:
-	 migrate -path internal/repository/migrations/ -database "postgresql://postgres:postgres@5432:5432/schedules_data?sslmode=disable" -verbose up
+	 migrate -path internal/repository/migrations/ -database "postgresql://postgres:postgres@localhost:5432/schedules_data?sslmode=disable" -verbose up
 
 dropdb:
 	docker exec -it schedule dropdb schedules

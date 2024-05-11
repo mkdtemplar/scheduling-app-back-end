@@ -12,4 +12,5 @@ type IUserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (*models.Users, error)
 	GetUserById(ctx context.Context, id int64) (*models.Users, error)
 	AllUsers(ctx *gin.Context) ([]*models.Users, error)
+	GetUserByIdForEdit(ctx context.Context, id int64) (*models.Users, error)
 }
