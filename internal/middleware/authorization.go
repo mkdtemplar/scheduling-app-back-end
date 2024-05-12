@@ -3,7 +3,6 @@ package middleware
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"scheduling-app-back-end/internal/repository/db"
 	"strconv"
@@ -40,15 +39,14 @@ func NewAuthorization(issuer string, audience string, secret string, tokenExpiry
 }
 
 type JwtUser struct {
-	ID        int64  `json:"id" db:"id" gorm:"type:bigserial"`
-	FirstName string `gorm:"type:text" json:"first_name" binding:"required"`
-	LastName  string `gorm:"type:text" json:"last_name" binding:"required"`
-	Email     string `json:"email" db:"email" gorm:"type:varchar(255)"`
+	ID        int64  `json:"id" binding:"required"`
+	FirstName string `json:"first_name" binding:"required"`
+	LastName  string `json:"last_name" binding:"required"`
 }
 
 type TokenPairs struct {
-	Token        string `json:"access_token" db:"access_token" gorm:"type:varchar(255)"`
-	RefreshToken string `json:"refresh_token" db:"refresh_token" gorm:"type:varchar(255)"`
+	Token        string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type Claims struct {
@@ -59,7 +57,7 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = fmt.Sprintf("%s%s", user.FirstName, user.LastName)
+	claims["name"] = fmt.Sprintf("%s %s", user.FirstName, user.LastName)
 	claims["sub"] = strconv.Itoa(int(user.ID))
 	claims["aud"] = j.Audience
 	claims["iss"] = j.Issuer
@@ -125,13 +123,11 @@ func (j *Authorization) RefreshToken(ctx *gin.Context) {
 				ctx.JSON(http.StatusUnauthorized, gin.H{"error": errors.New("user not found")})
 				return
 			}
-			log.Println(user)
 
 			u := &JwtUser{
 				ID:        user.ID,
 				FirstName: user.FirstName,
 				LastName:  user.LastName,
-				Email:     user.Email,
 			}
 
 			tokenPairs, err := j.GenerateTokenPairs(u)

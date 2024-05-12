@@ -115,3 +115,17 @@ func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.
 	}
 	return userFind, nil
 }
+
+func (p *PostgresDB) UpdateUser(ctx context.Context, id int64, firstName string, lastName string, email string,
+	currentPosition string, role string, positionId int64) (*models.Users, error) {
+
+	var userForUpdate = &models.Users{}
+
+	if err := p.DB.WithContext(ctx).Model(userForUpdate).Where("id = ?", id).
+		Updates(map[string]interface{}{"first_name": firstName, "last_name": lastName, "email": email,
+			"current_position": currentPosition, "role": role, "position_id": positionId}).Error; err != nil {
+		return &models.Users{}, err
+	}
+
+	return userForUpdate, nil
+}

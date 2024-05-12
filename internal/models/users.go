@@ -6,10 +6,10 @@ import (
 
 type Role string
 
-const (
-	Admin Role = "admin"
-	User  Role = "user"
-)
+//const (
+//	Admin Role = "admin"
+//	Users  Role = "user"
+//)
 
 type Users struct {
 	ID                int64     `gorm:"type:bigint;primaryKey" json:"id,string" binding:"required"`

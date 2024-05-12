@@ -58,7 +58,7 @@ func NewUserResponse(user *models.Users) *CreateUserResponse {
 	}
 }
 
-func (user *UserHandler) Create(ctx *gin.Context) {
+func (usr *UserHandler) Create(ctx *gin.Context) {
 	var req *createUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -84,7 +84,7 @@ func (user *UserHandler) Create(ctx *gin.Context) {
 		UpdatedAt:       time.Now(),
 	}
 
-	newUser, err := user.IUserRepository.CreateUser(ctx, arg)
+	newUser, err := usr.IUserRepository.CreateUser(ctx, arg)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -95,11 +95,11 @@ func (user *UserHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, response)
 }
 
-func (user *UserHandler) AllUsers(ctx *gin.Context) {
+func (usr *UserHandler) AllUsers(ctx *gin.Context) {
 
 	var allUsers []*CreateUserResponse
 
-	users, err := user.IUserRepository.AllUsers(ctx)
+	users, err := usr.IUserRepository.AllUsers(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -112,14 +112,14 @@ func (user *UserHandler) AllUsers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, allUsers)
 }
 
-func (user *UserHandler) GetUserById(ctx *gin.Context) {
+func (usr *UserHandler) GetUserById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Params.ByName("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	userById, err := user.IUserRepository.GetUserById(ctx, int64(id))
+	userById, err := usr.IUserRepository.GetUserById(ctx, int64(id))
 	if err != nil {
 		ctx.JSON(http.StatusNoContent, errorResponse(err))
 		return
@@ -130,7 +130,7 @@ func (user *UserHandler) GetUserById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-func (user *UserHandler) Authorization(ctx *gin.Context) {
+func (usr *UserHandler) Authorization(ctx *gin.Context) {
 
 	var requestPayload struct {
 		Email    string `json:"email" binding:"required" gorm:"type:email"`
@@ -142,7 +142,7 @@ func (user *UserHandler) Authorization(ctx *gin.Context) {
 		return
 	}
 
-	userFromDb, err := user.IUserRepository.GetUserByEmail(ctx, requestPayload.Email)
+	userFromDb, err := usr.IUserRepository.GetUserByEmail(ctx, requestPayload.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("invalid credentials")))
@@ -162,34 +162,69 @@ func (user *UserHandler) Authorization(ctx *gin.Context) {
 		ID:        userFromDb.ID,
 		FirstName: userFromDb.FirstName,
 		LastName:  userFromDb.LastName,
-		Email:     userFromDb.Email,
 	}
 
-	tokens, err := user.IJWTInterfaces.GenerateTokenPairs(&testUser)
+	tokens, err := usr.IJWTInterfaces.GenerateTokenPairs(&testUser)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("invalid credentials")))
 		return
 	}
 
-	user.IJWTInterfaces.GetRefreshCookie(tokens.RefreshToken, ctx)
+	usr.IJWTInterfaces.GetRefreshCookie(tokens.RefreshToken, ctx)
 
 	ctx.JSON(http.StatusAccepted, tokens)
 
 }
 
-func (user *UserHandler) GetUserByIdForEdit(ctx *gin.Context) {
+func (usr *UserHandler) GetUserByIdForEdit(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Params.ByName("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	userForEdit, err := user.IUserRepository.GetUserByIdForEdit(ctx, int64(id))
+	userForEdit, err := usr.IUserRepository.GetUserByIdForEdit(ctx, int64(id))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, userForEdit)
+
+	response := NewUserResponse(userForEdit)
+
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	userFromDb, err := usr.IUserRepository.GetUserByIdForEdit(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	userForEdit, err := utils.ParseUserPrefRequestBody(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	userFromDb, err = usr.IUserRepository.UpdateUser(ctx, int64(id), userForEdit.FirstName, userForEdit.LastName,
+		userForEdit.Email, userForEdit.CurrentPosition, string(userForEdit.Role), userForEdit.PositionID)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	response := NewUserResponse(userFromDb)
+
+	ctx.JSON(http.StatusOK, response)
+
 }
 
 func errorResponse(err error) gin.H {

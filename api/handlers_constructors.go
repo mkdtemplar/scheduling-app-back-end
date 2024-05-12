@@ -7,7 +7,7 @@ import (
 	"scheduling-app-back-end/internal/utils"
 )
 
-func (user *UserHandler) UserHandlerConstructor() *UserHandler {
+func (usr *UserHandler) UserHandlerConstructor() *UserHandler {
 	config, err := utils.LoadConfig(".")
 	if err != nil {
 		log.Fatal(err)
