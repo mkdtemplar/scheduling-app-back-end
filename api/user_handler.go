@@ -170,7 +170,7 @@ func (usr *UserHandler) Authorization(ctx *gin.Context) {
 		return
 	}
 
-	usr.IJWTInterfaces.GetRefreshCookie(tokens.RefreshToken, ctx)
+	usr.IJWTInterfaces.GetRefreshCookie(tokens.Token, ctx)
 
 	ctx.JSON(http.StatusAccepted, tokens)
 
