@@ -34,10 +34,10 @@ func (server *Server) setupRouter() {
 
 	router.Use(middleware.CORSMiddleware())
 
+	router.GET("/")
 	router.POST("/authenticate", userHandler.Authorization)
 	router.GET("/refresh", userHandler.RefreshToken)
 	router.GET("/logout", userHandler.Logout)
-	router.GET("/")
 	router.GET("/positions", positionHandler.AllPositions)
 	router.GET("/position/:id", positionHandler.GetPositionById)
 	router.GET("/all-users", userHandler.AllUsers)

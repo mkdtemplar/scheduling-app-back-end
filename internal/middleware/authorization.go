@@ -46,8 +46,8 @@ type JwtUser struct {
 }
 
 type TokenPairs struct {
-	Token string `json:"access_token"`
-	//RefreshToken string `json:"refresh_token"`
+	Token        string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type Claims struct {
@@ -58,7 +58,7 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = user.FirstName
+	claims["name"] = fmt.Sprintf("%s%s", user.FirstName, user.LastName)
 	claims["sub"] = strconv.Itoa(int(user.ID))
 	claims["aud"] = j.Audience
 	claims["iss"] = j.Issuer
@@ -72,20 +72,20 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 		return TokenPairs{}, err
 	}
 
-	//refreshToken := jwt.New(jwt.SigningMethodHS256)
-	//refreshTokenClaims := refreshToken.Claims.(jwt.MapClaims)
-	//refreshTokenClaims["sub"] = strconv.Itoa(int(user.ID))
-	//refreshTokenClaims["iat"] = time.Now().UTC().Unix()
-	//refreshTokenClaims["ext"] = time.Now().Add(j.RefreshExpiry).UTC().Unix()
-	//
-	//signedRefreshToken, err := refreshToken.SignedString([]byte(j.JWTSecret))
-	//if err != nil {
-	//	return TokenPairs{}, err
-	//}
+	refreshToken := jwt.New(jwt.SigningMethodHS256)
+	refreshTokenClaims := refreshToken.Claims.(jwt.MapClaims)
+	refreshTokenClaims["sub"] = strconv.Itoa(int(user.ID))
+	refreshTokenClaims["iat"] = time.Now().UTC().Unix()
+	refreshTokenClaims["ext"] = time.Now().Add(j.RefreshExpiry).UTC().Unix()
+
+	signedRefreshToken, err := refreshToken.SignedString([]byte(j.JWTSecret))
+	if err != nil {
+		return TokenPairs{}, err
+	}
 
 	tokenPairs := TokenPairs{
-		Token: signedAccessToken,
-		//RefreshToken: signedRefreshToken,
+		Token:        signedAccessToken,
+		RefreshToken: signedRefreshToken,
 	}
 
 	log.Println(claims["name"])
