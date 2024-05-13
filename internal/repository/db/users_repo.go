@@ -129,3 +129,19 @@ func (p *PostgresDB) UpdateUser(ctx context.Context, id int64, firstName string,
 
 	return userForUpdate, nil
 }
+
+func (p *PostgresDB) Delete(ctx context.Context, id int64) (int64, error) {
+	var err error
+
+	tx := p.DB.Begin()
+
+	delTx := tx.WithContext(ctx).Model(&models.Users{}).Delete(&models.Users{}, id)
+
+	if err = delTx.Error; err != nil {
+		return 0, err
+	} else {
+		tx.Commit()
+	}
+
+	return tx.RowsAffected, nil
+}

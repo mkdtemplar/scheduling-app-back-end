@@ -49,6 +49,7 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/user-edit/:id", userHandler.GetUserByIdForEdit)
 	authRoutes.PATCH("/edit-user/:id", userHandler.UpdateUser)
 	authRoutes.GET("/user/:id", userHandler.GetUserById)
+	authRoutes.DELETE("/delete-user/:id", userHandler.DeleteUser)
 
 	server.Router = router
 }

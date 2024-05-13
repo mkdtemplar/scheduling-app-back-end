@@ -179,6 +179,21 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 
 }
 
+func (usr *UserHandler) DeleteUser(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	_, err = usr.IUserRepository.Delete(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusNoContent, nil)
+}
+
 func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
 }
