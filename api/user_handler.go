@@ -186,12 +186,12 @@ func (usr *UserHandler) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	_, err = usr.IUserRepository.Delete(ctx, int64(id))
+	err = usr.IUserRepository.Delete(ctx, int64(id))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusNoContent, nil)
+	ctx.JSON(http.StatusAccepted, gin.H{"error": false, "message": "user deleted"})
 }
 
 func errorResponse(err error) gin.H {

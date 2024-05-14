@@ -15,5 +15,5 @@ type IUserRepository interface {
 	GetUserByIdForEdit(ctx context.Context, id int64) (*models.Users, error)
 	UpdateUser(ctx context.Context, id int64, firstName string, lastName string, email string,
 		currentPosition string, role string, positionId int64) (*models.Users, error)
-	Delete(ctx context.Context, id int64) (int64, error)
+	Delete(ctx context.Context, id int64) error
 }
