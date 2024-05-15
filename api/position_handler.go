@@ -11,44 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type createPositionRequest struct {
-	PositionName string    `json:"position_name" gorm:"type:text"`
-	StartTime    string    `json:"start_time" gorm:"type:varchar(10)"`
-	UpdatedAt    time.Time `json:"-" gorm:"type:timestamp"`
-}
-
-type getPositionRequest struct {
-	ID int64 `uri:"id" binding:"required"`
-}
-
-type positionResponse struct {
-	ID           int64                     `gorm:"type:bigint;primaryKey" json:"id"`
-	PositionName string                    `json:"position_name" gorm:"type:text"`
-	Users        []*dto.CreateUserResponse `gorm:"foreignKey:PositionID;references:ID" json:"users,omitempty"`
-	Shifts       []*models.Shifts          `gorm:"foreignKey:PositionID;references:ID" json:"shifts,omitempty"`
-	CreatedAt    time.Time                 `json:"-" gorm:"type:timestamp"`
-	UpdatedAt    time.Time                 `json:"-" gorm:"type:timestamp"`
-	UsersArray   []int64                   `gorm:"-" json:"users_array,omitempty"`
-}
-
-func newPositionResponse(positions *models.Positions) *positionResponse {
-	var allUsers []*dto.CreateUserResponse
-	for _, u := range positions.Users {
-		i := dto.NewUserResponse(u)
-		allUsers = append(allUsers, i)
-	}
-
-	response := &positionResponse{
-		ID:           positions.ID,
-		PositionName: positions.PositionName,
-		Users:        allUsers,
-		Shifts:       positions.Shifts,
-		UsersArray:   positions.UsersArray,
-	}
-
-	return response
-}
-
 func NewPositionHandler(IPositionRepository interfaces.IPositionsRepository) *PositionHandler {
 	return &PositionHandler{
 		IPositionsRepository: IPositionRepository,
@@ -56,7 +18,7 @@ func NewPositionHandler(IPositionRepository interfaces.IPositionsRepository) *Po
 }
 
 func (i *PositionHandler) CreatePosition(ctx *gin.Context) {
-	var req *createPositionRequest
+	var req *dto.CreatePositionRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -78,7 +40,7 @@ func (i *PositionHandler) CreatePosition(ctx *gin.Context) {
 }
 
 func (i *PositionHandler) AllPositions(ctx *gin.Context) {
-	var allPositions []*positionResponse
+	var allPositions []*dto.PositionResponse
 	positions, err := i.IPositionsRepository.AllPositions(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -88,14 +50,14 @@ func (i *PositionHandler) AllPositions(ctx *gin.Context) {
 		position.UsersArray = append(position.UsersArray, position.ID)
 	}
 	for _, position := range positions {
-		allPositions = append(allPositions, newPositionResponse(position))
+		allPositions = append(allPositions, dto.NewPositionResponse(position))
 	}
 
 	ctx.JSON(http.StatusOK, allPositions)
 }
 
 func (i *PositionHandler) GetPositionById(ctx *gin.Context) {
-	var req getPositionRequest
+	var req dto.GetPositionRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
