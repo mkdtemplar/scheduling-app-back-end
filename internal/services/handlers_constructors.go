@@ -1,13 +1,17 @@
-package api
+package services
 
 import (
 	"log"
+	"scheduling-app-back-end/api"
 	"scheduling-app-back-end/internal/middleware"
 	"scheduling-app-back-end/internal/repository/db"
 	"scheduling-app-back-end/internal/utils"
 )
 
-func (usr *UserHandler) UserHandlerConstructor() *UserHandler {
+type Usr api.UserHandler
+type Pos api.PositionHandler
+
+func (usr *Usr) UserHandlerConstructor() *api.UserHandler {
 	config, err := utils.LoadConfig(".")
 	if err != nil {
 		log.Fatal(err)
@@ -17,10 +21,10 @@ func (usr *UserHandler) UserHandlerConstructor() *UserHandler {
 	tokenPairs := middleware.NewAuthorization(config.Issuer, config.Audience, config.JWTSecret, config.TokenExpiry,
 		config.RefreshExpiry, config.CookieDomain, config.CookiePath, config.CookieName)
 
-	return NewUserHandler(userRepo, tokenPairs)
+	return api.NewUserHandler(userRepo, tokenPairs)
 }
 
-func (i *PositionHandler) PositionHandlerConstructor() *PositionHandler {
+func (i *Pos) PositionHandlerConstructor() *api.PositionHandler {
 	positionRepo := db.NewPositionRepo()
-	return NewPositionHandler(positionRepo)
+	return api.NewPositionHandler(positionRepo)
 }

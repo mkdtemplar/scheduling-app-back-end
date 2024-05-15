@@ -1,8 +1,8 @@
 package server
 
 import (
-	"scheduling-app-back-end/api"
 	"scheduling-app-back-end/internal/middleware"
+	"scheduling-app-back-end/internal/services"
 	"scheduling-app-back-end/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -23,8 +23,8 @@ func NewServer(config utils.Config) (*Server, error) {
 }
 
 func (server *Server) setupRouter() {
-	var userHandlers api.UserHandler
-	var positionsHandlers api.PositionHandler
+	var userHandlers services.Usr
+	var positionsHandlers services.Pos
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
