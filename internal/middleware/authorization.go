@@ -58,7 +58,7 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = fmt.Sprintf("%s%s", user.FirstName, user.LastName)
+	claims["name"] = fmt.Sprintf("%s %s", user.FirstName, user.LastName)
 	claims["sub"] = strconv.Itoa(int(user.ID))
 	claims["aud"] = j.Audience
 	claims["iss"] = j.Issuer
