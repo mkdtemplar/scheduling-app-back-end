@@ -8,10 +8,10 @@ import (
 	"scheduling-app-back-end/internal/utils"
 )
 
-type Usr api.UserHandler
-type Pos api.PositionHandler
+type UserHandler api.UserHandler
+type PositionHandler api.PositionHandler
 
-func (usr *Usr) UserHandlerConstructor() *api.UserHandler {
+func (usr *UserHandler) UserHandlerConstructor() *api.UserHandler {
 	config, err := utils.LoadConfig(".")
 	if err != nil {
 		log.Fatal(err)
@@ -24,7 +24,7 @@ func (usr *Usr) UserHandlerConstructor() *api.UserHandler {
 	return api.NewUserHandler(userRepo, tokenPairs)
 }
 
-func (i *Pos) PositionHandlerConstructor() *api.PositionHandler {
+func (i *PositionHandler) PositionHandlerConstructor() *api.PositionHandler {
 	positionRepo := db.NewPositionRepo()
 	return api.NewPositionHandler(positionRepo)
 }

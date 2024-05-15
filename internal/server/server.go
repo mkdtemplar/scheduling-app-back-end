@@ -23,8 +23,8 @@ func NewServer(config utils.Config) (*Server, error) {
 }
 
 func (server *Server) setupRouter() {
-	var userHandlers services.Usr
-	var positionsHandlers services.Pos
+	var userHandlers services.UserHandler
+	var positionsHandlers services.PositionHandler
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
@@ -41,6 +41,7 @@ func (server *Server) setupRouter() {
 	router.GET("/positions", positionHandler.AllPositions)
 	router.GET("/position/:id", positionHandler.GetPositionById)
 	router.GET("/all-users", userHandler.AllUsers)
+	router.GET("/user/:id", userHandler.GetUserById)
 
 	authRoutes := router.Group("/admin").Use(userHandler.IJWTInterfaces.AuthRequired())
 	authRoutes.PUT("/add-user", userHandler.Create)
@@ -48,7 +49,7 @@ func (server *Server) setupRouter() {
 	authRoutes.GET("/edit-position/:id", positionHandler.GetPositionByIdForEdit)
 	authRoutes.GET("/user-edit/:id", userHandler.GetUserByIdForEdit)
 	authRoutes.PATCH("/edit-user/:id", userHandler.UpdateUser)
-	authRoutes.GET("/user/:id", userHandler.GetUserById)
+
 	authRoutes.DELETE("/delete-user/:id", userHandler.DeleteUser)
 
 	server.Router = router
