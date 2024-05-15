@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"scheduling-app-back-end/internal/models"
+	"scheduling-app-back-end/internal/models/dto"
 	"scheduling-app-back-end/internal/repository/interfaces"
 	"strconv"
 	"time"
@@ -21,19 +22,19 @@ type getPositionRequest struct {
 }
 
 type positionResponse struct {
-	ID           int64                 `gorm:"type:bigint;primaryKey" json:"id"`
-	PositionName string                `json:"position_name" gorm:"type:text"`
-	Users        []*CreateUserResponse `gorm:"foreignKey:PositionID;references:ID" json:"users,omitempty"`
-	Shifts       []*models.Shifts      `gorm:"foreignKey:PositionID;references:ID" json:"shifts,omitempty"`
-	CreatedAt    time.Time             `json:"-" gorm:"type:timestamp"`
-	UpdatedAt    time.Time             `json:"-" gorm:"type:timestamp"`
-	UsersArray   []int64               `gorm:"-" json:"users_array,omitempty"`
+	ID           int64                     `gorm:"type:bigint;primaryKey" json:"id"`
+	PositionName string                    `json:"position_name" gorm:"type:text"`
+	Users        []*dto.CreateUserResponse `gorm:"foreignKey:PositionID;references:ID" json:"users,omitempty"`
+	Shifts       []*models.Shifts          `gorm:"foreignKey:PositionID;references:ID" json:"shifts,omitempty"`
+	CreatedAt    time.Time                 `json:"-" gorm:"type:timestamp"`
+	UpdatedAt    time.Time                 `json:"-" gorm:"type:timestamp"`
+	UsersArray   []int64                   `gorm:"-" json:"users_array,omitempty"`
 }
 
 func newPositionResponse(positions *models.Positions) *positionResponse {
-	var allUsers []*CreateUserResponse
+	var allUsers []*dto.CreateUserResponse
 	for _, u := range positions.Users {
-		i := NewUserResponse(u)
+		i := dto.NewUserResponse(u)
 		allUsers = append(allUsers, i)
 	}
 
