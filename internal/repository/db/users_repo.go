@@ -39,16 +39,16 @@ func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.
 	}
 
 	userFind := &models.Users{
-		ID:              user.ID,
-		FirstName:       user.FirstName,
-		Email:           user.Email,
-		Password:        user.Password,
-		CurrentPosition: user.CurrentPosition,
-		Role:            user.Role,
-		Shifts:          user.Shifts,
-		CreatedAt:       user.CreatedAt,
-		UpdatedAt:       user.UpdatedAt,
-		PositionID:      user.PositionID,
+		ID:           user.ID,
+		FirstName:    user.FirstName,
+		Email:        user.Email,
+		Password:     user.Password,
+		PositionName: user.PositionName,
+		Role:         user.Role,
+		Shifts:       user.Shifts,
+		CreatedAt:    user.CreatedAt,
+		UpdatedAt:    user.UpdatedAt,
+		PositionID:   user.PositionID,
 	}
 	return userFind, nil
 }
@@ -60,17 +60,17 @@ func (p *PostgresDB) GetUserById(ctx context.Context, id int64) (*models.Users, 
 		return &models.Users{}, err
 	}
 	userFind := &models.Users{
-		ID:              user.ID,
-		FirstName:       user.FirstName,
-		LastName:        user.LastName,
-		Email:           user.Email,
-		Password:        user.Password,
-		CurrentPosition: user.CurrentPosition,
-		Role:            user.Role,
-		Shifts:          user.Shifts,
-		CreatedAt:       user.CreatedAt,
-		UpdatedAt:       user.UpdatedAt,
-		PositionID:      user.PositionID,
+		ID:           user.ID,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		Email:        user.Email,
+		Password:     user.Password,
+		PositionName: user.PositionName,
+		Role:         user.Role,
+		Shifts:       user.Shifts,
+		CreatedAt:    user.CreatedAt,
+		UpdatedAt:    user.UpdatedAt,
+		PositionID:   user.PositionID,
 	}
 
 	return userFind, nil
@@ -97,17 +97,17 @@ func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.
 		return &models.Users{}, err
 	}
 	userFind := &models.Users{
-		ID:              user.ID,
-		FirstName:       user.FirstName,
-		LastName:        user.LastName,
-		Email:           user.Email,
-		Password:        user.Password,
-		CurrentPosition: user.CurrentPosition,
-		Role:            user.Role,
-		Shifts:          user.Shifts,
-		CreatedAt:       user.CreatedAt,
-		UpdatedAt:       user.UpdatedAt,
-		PositionID:      user.PositionID,
+		ID:           user.ID,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		Email:        user.Email,
+		Password:     user.Password,
+		PositionName: user.PositionName,
+		Role:         user.Role,
+		Shifts:       user.Shifts,
+		CreatedAt:    user.CreatedAt,
+		UpdatedAt:    user.UpdatedAt,
+		PositionID:   user.PositionID,
 	}
 
 	for _, position := range positions {
