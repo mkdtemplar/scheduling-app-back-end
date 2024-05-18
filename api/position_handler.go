@@ -6,7 +6,6 @@ import (
 	"scheduling-app-back-end/internal/models/dto"
 	"scheduling-app-back-end/internal/repository/interfaces"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,8 +25,6 @@ func (i *PositionHandler) CreatePosition(ctx *gin.Context) {
 
 	arg := &models.Positions{
 		PositionName: req.PositionName,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
 	}
 
 	newPosition, err := i.IPositionsRepository.CreatePosition(ctx, arg)

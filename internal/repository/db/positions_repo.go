@@ -59,7 +59,7 @@ func (p *PostgresDB) GetPositionByIdForEdit(ctx context.Context, id int64) (*mod
 
 func (p *PostgresDB) AllPositionsForUserAddEdit(ctx context.Context) ([]*models.Positions, error) {
 	var positions []*models.Positions
-	if err := p.DB.WithContext(ctx).Model(&models.Positions{}).Select("position_name").Find(&positions).Error; err != nil {
+	if err := p.DB.WithContext(ctx).Model(&models.Positions{}).Select("id", "position_name").Find(&positions).Error; err != nil {
 		return []*models.Positions{}, err
 	}
 

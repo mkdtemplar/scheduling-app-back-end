@@ -2,13 +2,10 @@ package dto
 
 import (
 	"scheduling-app-back-end/internal/models"
-	"time"
 )
 
 type CreatePositionRequest struct {
-	PositionName string    `json:"position_name" gorm:"type:text"`
-	StartTime    string    `json:"start_time" gorm:"type:varchar(10)"`
-	UpdatedAt    time.Time `json:"-" gorm:"type:timestamp"`
+	PositionName string `json:"position_name" gorm:"type:text"`
 }
 
 type GetPositionRequest struct {
@@ -20,12 +17,11 @@ type PositionResponse struct {
 	PositionName string                `json:"position_name" gorm:"type:text"`
 	Users        []*CreateUserResponse `gorm:"foreignKey:PositionID;references:ID" json:"users,omitempty"`
 	Shifts       []*models.Shifts      `gorm:"foreignKey:PositionID;references:ID" json:"shifts,omitempty"`
-	CreatedAt    time.Time             `json:"-" gorm:"type:timestamp"`
-	UpdatedAt    time.Time             `json:"-" gorm:"type:timestamp"`
 	UsersArray   []int64               `gorm:"-" json:"users_array,omitempty"`
 }
 
 type PositionForUserCreateAndEdit struct {
+	ID           int64  `json:"id"`
 	PositionName string `json:"position_name" gorm:"type:text"`
 }
 
@@ -48,5 +44,5 @@ func NewPositionResponse(positions *models.Positions) *PositionResponse {
 }
 
 func PositionResponseFroUserAddEdit(positions *models.Positions) *PositionForUserCreateAndEdit {
-	return &PositionForUserCreateAndEdit{PositionName: positions.PositionName}
+	return &PositionForUserCreateAndEdit{ID: positions.ID, PositionName: positions.PositionName}
 }

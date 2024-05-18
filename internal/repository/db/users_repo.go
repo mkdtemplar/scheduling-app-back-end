@@ -40,11 +40,10 @@ func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.
 
 	userFind := &models.Users{
 		ID:           user.ID,
-		FirstName:    user.FirstName,
+		NameSurname:  user.NameSurname,
 		Email:        user.Email,
 		Password:     user.Password,
 		PositionName: user.PositionName,
-		Role:         user.Role,
 		Shifts:       user.Shifts,
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
@@ -61,12 +60,10 @@ func (p *PostgresDB) GetUserById(ctx context.Context, id int64) (*models.Users, 
 	}
 	userFind := &models.Users{
 		ID:           user.ID,
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
+		NameSurname:  user.NameSurname,
 		Email:        user.Email,
 		Password:     user.Password,
 		PositionName: user.PositionName,
-		Role:         user.Role,
 		Shifts:       user.Shifts,
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
@@ -98,12 +95,10 @@ func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.
 	}
 	userFind := &models.Users{
 		ID:           user.ID,
-		FirstName:    user.FirstName,
-		LastName:     user.LastName,
+		NameSurname:  user.NameSurname,
 		Email:        user.Email,
 		Password:     user.Password,
 		PositionName: user.PositionName,
-		Role:         user.Role,
 		Shifts:       user.Shifts,
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
@@ -116,14 +111,14 @@ func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.
 	return userFind, nil
 }
 
-func (p *PostgresDB) UpdateUser(ctx context.Context, id int64, firstName string, lastName string, email string,
-	currentPosition string, role string, positionId int64) (*models.Users, error) {
+func (p *PostgresDB) UpdateUser(ctx context.Context, id int64, nameSurname string, email string,
+	currentPosition string, positionId int64) (*models.Users, error) {
 
 	var userForUpdate = &models.Users{}
 
 	if err := p.DB.WithContext(ctx).Model(userForUpdate).Where("id = ?", id).
-		Updates(map[string]interface{}{"first_name": firstName, "last_name": lastName, "email": email,
-			"current_position": currentPosition, "role": role, "position_id": positionId}).Error; err != nil {
+		Updates(map[string]interface{}{"name_surname": nameSurname, "email": email,
+			"current_position": currentPosition, "position_id": positionId}).Error; err != nil {
 		return &models.Users{}, err
 	}
 

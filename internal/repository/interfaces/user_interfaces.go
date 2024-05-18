@@ -13,7 +13,7 @@ type IUserRepository interface {
 	GetUserById(ctx context.Context, id int64) (*models.Users, error)
 	AllUsers(ctx *gin.Context) ([]*models.Users, error)
 	GetUserByIdForEdit(ctx context.Context, id int64) (*models.Users, error)
-	UpdateUser(ctx context.Context, id int64, firstName string, lastName string, email string,
-		currentPosition string, role string, positionId int64) (*models.Users, error)
+	UpdateUser(ctx context.Context, id int64, nameSurname string, email string,
+		currentPosition string, positionId int64) (*models.Users, error)
 	Delete(ctx context.Context, id int64) error
 }

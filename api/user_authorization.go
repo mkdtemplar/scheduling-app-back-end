@@ -39,9 +39,8 @@ func (usr *UserHandler) Authorization(ctx *gin.Context) {
 	}
 
 	testUser := middleware.JwtUser{
-		ID:        userFromDb.ID,
-		FirstName: userFromDb.FirstName,
-		LastName:  userFromDb.LastName,
+		ID:          userFromDb.ID,
+		NameSurname: userFromDb.NameSurname,
 	}
 
 	tokens, err := usr.IJWTInterfaces.GenerateTokenPairs(&testUser)

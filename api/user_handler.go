@@ -35,12 +35,10 @@ func (usr *UserHandler) Create(ctx *gin.Context) {
 
 	arg := &models.Users{
 		ID:           req.ID,
-		FirstName:    req.FirstName,
-		LastName:     req.LastName,
+		NameSurname:  req.NameSurname,
 		Email:        req.Email,
 		Password:     hashedPassword,
 		PositionName: req.PositionName,
-		Role:         req.Role,
 		PositionID:   req.PositionID,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
@@ -129,8 +127,8 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	userFromDb, err = usr.IUserRepository.UpdateUser(ctx, int64(id), userForEdit.FirstName, userForEdit.LastName,
-		userForEdit.Email, userForEdit.PositionName, string(userForEdit.Role), userForEdit.PositionID)
+	userFromDb, err = usr.IUserRepository.UpdateUser(ctx, int64(id), userForEdit.NameSurname,
+		userForEdit.Email, userForEdit.PositionName, userForEdit.PositionID)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
