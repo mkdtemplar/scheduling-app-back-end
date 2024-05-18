@@ -13,11 +13,16 @@ type Handler struct {
 type UserHandler struct {
 	Handler
 	interfaces.IUserRepository
-	middleware.IJWTInterfaces
-	middleware.JwtUser
 }
 
 type PositionHandler struct {
 	Handler
 	interfaces.IPositionsRepository
+}
+
+type AdminHandler struct {
+	Handler
+	middleware.IJWTInterfaces
+	middleware.JwtUser
+	interfaces.IAdminInterfaces
 }

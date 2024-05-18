@@ -23,28 +23,30 @@ func NewServer(config utils.Config) (*Server, error) {
 }
 
 func (server *Server) setupRouter() {
-	var userHandlers services.UserHandler
+	var adminHandlers services.AdminHandler
 	var positionsHandlers services.PositionHandler
+	var userHandlers services.UserHandler
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
 
-	userHandler := userHandlers.UserHandlerConstructor()
+	adminHandler := adminHandlers.AdminHandlerConstructor()
 	positionHandler := positionsHandlers.PositionHandlerConstructor()
+	userHandler := userHandlers.UserHandlerConstructor()
 
 	router.Use(middleware.CORSMiddleware())
 
 	router.GET("/")
-	router.POST("/authenticate", userHandler.Authorization)
-	router.GET("/refresh", userHandler.RefreshToken)
-	router.GET("/logout", userHandler.Logout)
+	router.POST("/authenticate", adminHandler.Authorization)
+	router.GET("/refresh", adminHandler.RefreshToken)
+	router.GET("/logout", adminHandler.Logout)
 	router.GET("/positions", positionHandler.AllPositions)
 	router.GET("/position/:id", positionHandler.GetPositionById)
 	router.GET("/position-for-user", positionHandler.AllPositionsForUserAddEdit)
 	router.GET("/all-users", userHandler.AllUsers)
 	router.GET("/user/:id", userHandler.GetUserById)
 
-	authRoutes := router.Group("/admin").Use(userHandler.IJWTInterfaces.AuthRequired())
+	authRoutes := router.Group("/admin").Use(adminHandler.IJWTInterfaces.AuthRequired())
 	authRoutes.PUT("/add-user", userHandler.Create)
 	authRoutes.PUT("/add-position/0", positionHandler.CreatePosition)
 	authRoutes.GET("/edit-position/:id", positionHandler.GetPositionByIdForEdit)

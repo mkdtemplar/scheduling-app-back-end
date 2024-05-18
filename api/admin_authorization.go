@@ -10,10 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func (usr *UserHandler) Authorization(ctx *gin.Context) {
+func (adm *AdminHandler) Authorization(ctx *gin.Context) {
 
 	var requestPayload struct {
-		Email    string `json:"email" binding:"required" gorm:"type:email"`
+		Username string `json:"user_name" binding:"required" gorm:"type:email"`
 		Password string `json:"password" binding:"required" gorm:"type:password"`
 	}
 
@@ -22,7 +22,7 @@ func (usr *UserHandler) Authorization(ctx *gin.Context) {
 		return
 	}
 
-	userFromDb, err := usr.IUserRepository.GetUserByEmail(ctx, requestPayload.Email)
+	adminByEmail, err := adm.IAdminInterfaces.GetAdminByEmail(ctx, requestPayload.Username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("invalid credentials")))
@@ -32,24 +32,24 @@ func (usr *UserHandler) Authorization(ctx *gin.Context) {
 		return
 	}
 
-	valid, err := utils.CheckPassword(requestPayload.Password, userFromDb.Password)
+	valid, err := utils.CheckPassword(requestPayload.Password, adminByEmail.Password)
 	if err != nil || !valid {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
 	testUser := middleware.JwtUser{
-		ID:          userFromDb.ID,
-		NameSurname: userFromDb.NameSurname,
+		ID:          adminByEmail.ID,
+		NameSurname: adminByEmail.UserName,
 	}
 
-	tokens, err := usr.IJWTInterfaces.GenerateTokenPairs(&testUser)
+	tokens, err := adm.IJWTInterfaces.GenerateTokenPairs(&testUser)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("invalid credentials")))
 		return
 	}
 
-	usr.IJWTInterfaces.GetRefreshCookie(tokens.Token, ctx)
+	adm.IJWTInterfaces.GetRefreshCookie(tokens.Token, ctx)
 
 	ctx.JSON(http.StatusAccepted, tokens)
 

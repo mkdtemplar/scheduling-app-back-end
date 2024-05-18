@@ -8,23 +8,29 @@ import (
 	"scheduling-app-back-end/internal/utils"
 )
 
-type UserHandler api.UserHandler
+type AdminHandler api.AdminHandler
 type PositionHandler api.PositionHandler
+type UserHandler api.UserHandler
 
-func (usr *UserHandler) UserHandlerConstructor() *api.UserHandler {
+func (adm *AdminHandler) AdminHandlerConstructor() *api.AdminHandler {
 	config, err := utils.LoadConfig(".")
 	if err != nil {
 		log.Fatal(err)
 	}
-	userRepo := db.NewUserRepo()
+	adminRepo := db.NewAdminRepo()
 
 	tokenPairs := middleware.NewAuthorization(config.Issuer, config.Audience, config.JWTSecret, config.TokenExpiry,
 		config.RefreshExpiry, config.CookieDomain, config.CookiePath, config.CookieName)
 
-	return api.NewUserHandler(userRepo, tokenPairs)
+	return api.NewAdminHandler(adminRepo, tokenPairs)
 }
 
 func (i *PositionHandler) PositionHandlerConstructor() *api.PositionHandler {
 	positionRepo := db.NewPositionRepo()
 	return api.NewPositionHandler(positionRepo)
+}
+
+func (usr *UserHandler) UserHandlerConstructor() *api.UserHandler {
+	userRepo := db.NewUserRepo()
+	return api.NewUserHandler(userRepo)
 }

@@ -41,7 +41,7 @@ func NewAuthorization(issuer string, audience string, secret string, tokenExpiry
 
 type JwtUser struct {
 	ID          int64  `json:"id" binding:"required"`
-	NameSurname string `json:"first_name" binding:"required"`
+	NameSurname string `json:"name_surname" binding:"required"`
 }
 
 type TokenPairs struct {

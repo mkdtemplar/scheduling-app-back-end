@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"scheduling-app-back-end/internal/middleware"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/models/dto"
 	"scheduling-app-back-end/internal/repository/interfaces"
@@ -13,10 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewUserHandler(IUserRepository interfaces.IUserRepository, IJWTInterfaces middleware.IJWTInterfaces) *UserHandler {
+func NewUserHandler(IUserRepository interfaces.IUserRepository) *UserHandler {
 	return &UserHandler{
 		IUserRepository: IUserRepository,
-		IJWTInterfaces:  IJWTInterfaces,
 	}
 }
 
