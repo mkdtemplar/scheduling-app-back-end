@@ -19,24 +19,6 @@ create table if not exists public.positions
 alter table public.positions
     owner to postgres;
 
-create table if not exists public.shifts
-(
-    id          bigserial
-        primary key,
-    name        varchar(5),
-    start_time  timestamp with time zone,
-    end_time    timestamp with time zone,
-    position_id bigint
-        constraint fk_positions_shifts
-            references public.positions,
-    user_id     bigint
-        constraint fk_users_shifts
-            references public.users
-);
-
-alter table public.shifts
-    owner to postgres;
-
 create table if not exists public.users
 (
     id            bigint not null
@@ -55,3 +37,21 @@ create table if not exists public.users
 alter table public.users
     owner to postgres;
 
+
+create table if not exists public.shifts
+(
+    id          bigserial
+        primary key,
+    name        varchar(5),
+    start_time  timestamp with time zone,
+    end_time    timestamp with time zone,
+    position_id bigint
+        constraint fk_positions_shifts
+            references public.positions,
+    user_id     bigint
+        constraint fk_users_shifts
+            references public.users
+);
+
+alter table public.shifts
+    owner to postgres;

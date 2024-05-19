@@ -81,8 +81,9 @@ func (p *PostgresDB) DeleteAdmin(ctx context.Context, id int64) error {
 	delTx := tx.WithContext(ctx).Model(&models.Admin{}).Delete(&models.Admin{}, id)
 
 	if err := delTx.Error; err != nil {
-		tx.Rollback()
 		return err
+	} else {
+		tx.Commit()
 	}
 
 	return nil
