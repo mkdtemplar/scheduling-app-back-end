@@ -11,4 +11,5 @@ type IAdminInterfaces interface {
 	UpdateAdmin(ctx context.Context, id int64, username string, password string) (*models.Admin, error)
 	GetAdminById(ctx context.Context, id int64) (*models.Admin, error)
 	DeleteAdmin(ctx context.Context, id int64) error
+	AllAdmins(ctx context.Context) ([]*models.Admin, error)
 }

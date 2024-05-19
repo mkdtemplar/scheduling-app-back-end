@@ -29,6 +29,7 @@ func (server *Server) setupRouter() {
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
+	gin.ForceConsoleColor()
 
 	adminHandler := adminHandlers.AdminHandlerConstructor()
 	positionHandler := positionsHandlers.PositionHandlerConstructor()
@@ -54,9 +55,10 @@ func (server *Server) setupRouter() {
 	authRoutes.PATCH("/edit-user/:id", userHandler.UpdateUser)
 
 	authRoutes.DELETE("/delete-user/:id", userHandler.DeleteUser)
-
+	authRoutes.GET("/all-admins", adminHandler.AllAdmins)
 	authRoutes.PUT("/create-admin", adminHandler.CreateAdmin)
-	authRoutes.PATCH("/update-admin", adminHandler.UpdateAdmin)
+	authRoutes.GET("/get-admin/:id", adminHandler.GetAdminById)
+	authRoutes.PATCH("/update-admin/:id", adminHandler.UpdateAdmin)
 	authRoutes.DELETE("/delete-admin/:id", adminHandler.DeleteAdmin)
 
 	server.Router = router

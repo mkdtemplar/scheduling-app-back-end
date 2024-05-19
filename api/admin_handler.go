@@ -16,6 +16,22 @@ func NewAdminHandler(IAdminInterfaces interfaces.IAdminInterfaces, IJWTInterface
 	return &AdminHandler{IAdminInterfaces: IAdminInterfaces, IJWTInterfaces: IJWTInterfaces}
 }
 
+func (adm *AdminHandler) AllAdmins(ctx *gin.Context) {
+	var allAdmins []*dto.CreateAdminResponse
+
+	admins, err := adm.IAdminInterfaces.AllAdmins(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	for _, admin := range admins {
+		a := dto.NewAdminResponse(admin)
+		allAdmins = append(allAdmins, a)
+	}
+	ctx.JSON(http.StatusOK, allAdmins)
+}
+
 func (adm *AdminHandler) CreateAdmin(ctx *gin.Context) {
 	var req *dto.CreateAdminRequest
 
@@ -95,4 +111,20 @@ func (adm *AdminHandler) DeleteAdmin(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusAccepted, gin.H{"error": false, "message": "admin deleted"})
+}
+
+func (adm *AdminHandler) GetAdminById(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	admin, err := adm.IAdminInterfaces.GetAdminById(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, admin)
 }

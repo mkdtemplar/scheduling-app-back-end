@@ -23,6 +23,15 @@ func (p *PostgresDB) CreateAdmin(ctx context.Context, admin *models.Admin) (*mod
 	return admin, nil
 }
 
+func (p *PostgresDB) AllAdmins(ctx context.Context) ([]*models.Admin, error) {
+	var admins []*models.Admin
+
+	if err := p.DB.WithContext(ctx).Find(&admins).Error; err != nil {
+		return admins, err
+	}
+	return admins, nil
+}
+
 func (p *PostgresDB) GetAdminByEmail(ctx context.Context, username string) (*models.Admin, error) {
 	admin := &models.Admin{}
 
