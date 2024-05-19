@@ -46,6 +46,8 @@ func (server *Server) setupRouter() {
 	router.GET("/position-for-user", positionHandler.AllPositionsForUserAddEdit)
 	router.GET("/all-users", userHandler.AllUsers)
 	router.GET("/user/:id", userHandler.GetUserById)
+	router.GET("/all-admins", adminHandler.AllAdmins)
+	router.GET("/get-admin/:id", adminHandler.GetAdminById)
 
 	authRoutes := router.Group("/admin").Use(adminHandler.IJWTInterfaces.AuthRequired())
 	authRoutes.PUT("/add-user", userHandler.Create)
@@ -55,9 +57,9 @@ func (server *Server) setupRouter() {
 	authRoutes.PATCH("/edit-user/:id", userHandler.UpdateUser)
 
 	authRoutes.DELETE("/delete-user/:id", userHandler.DeleteUser)
-	authRoutes.GET("/all-admins", adminHandler.AllAdmins)
+
 	authRoutes.PUT("/create-admin", adminHandler.CreateAdmin)
-	authRoutes.GET("/get-admin/:id", adminHandler.GetAdminById)
+
 	authRoutes.PATCH("/update-admin/:id", adminHandler.UpdateAdmin)
 	authRoutes.DELETE("/delete-admin/:id", adminHandler.DeleteAdmin)
 

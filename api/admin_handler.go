@@ -76,7 +76,7 @@ func (adm *AdminHandler) UpdateAdmin(ctx *gin.Context) {
 		return
 	}
 
-	adminForEdit, err := utils.ParseUserPrefRequestBody(ctx)
+	adminForEdit, err := utils.ParseAdminRequestBody(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -88,7 +88,7 @@ func (adm *AdminHandler) UpdateAdmin(ctx *gin.Context) {
 		return
 	}
 
-	adminFromDb, err = adm.IAdminInterfaces.UpdateAdmin(ctx, adminForEdit.ID, adminForEdit.NameSurname, hashedPassword)
+	adminFromDb, err = adm.IAdminInterfaces.UpdateAdmin(ctx, adminForEdit.ID, adminForEdit.UserName, hashedPassword)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
