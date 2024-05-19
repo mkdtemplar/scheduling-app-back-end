@@ -125,7 +125,7 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	userFromDb, err = usr.IUserRepository.UpdateUser(ctx, int64(id), userForEdit.NameSurname,
+	userFromDb, err = usr.IUserRepository.UpdateUser(ctx, userForEdit.ID, userForEdit.NameSurname,
 		userForEdit.Email, userForEdit.PositionName, userForEdit.PositionID)
 
 	if err != nil {

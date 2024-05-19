@@ -4,8 +4,6 @@ import (
 	"time"
 )
 
-type Role string
-
 type Users struct {
 	ID                int64     `gorm:"type:bigint;primaryKey" json:"id,string" binding:"required"`
 	NameSurname       string    `gorm:"type:text" json:"name_surname" binding:"required"`

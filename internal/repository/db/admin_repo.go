@@ -38,3 +38,43 @@ func (p *PostgresDB) GetAdminByEmail(ctx context.Context, username string) (*mod
 	}
 	return adminFind, nil
 }
+
+func (p *PostgresDB) GetAdminById(ctx context.Context, id int64) (*models.Admin, error) {
+	admin := &models.Admin{}
+	err := p.DB.WithContext(ctx).Model(&models.Admin{}).Where("id = ?", id).Take(&admin).Error
+	if err != nil {
+		return &models.Admin{}, err
+	}
+	adminFind := &models.Admin{
+		ID:       admin.ID,
+		UserName: admin.UserName,
+		Password: admin.Password,
+	}
+
+	return adminFind, nil
+}
+
+func (p *PostgresDB) UpdateAdmin(ctx context.Context, id int64, username string, password string) (*models.Admin, error) {
+	var adminForUpdate = &models.Admin{}
+
+	if err := p.DB.WithContext(ctx).Model(adminForUpdate).
+		Where("id = ?", id).
+		Updates(map[string]interface{}{"id": id, "user_name": username, "password": password}).Error; err != nil {
+		return &models.Admin{}, err
+	}
+	return adminForUpdate, nil
+}
+
+func (p *PostgresDB) DeleteAdmin(ctx context.Context, id int64) error {
+
+	tx := p.DB.Begin()
+
+	delTx := tx.WithContext(ctx).Model(&models.Admin{}).Delete(&models.Admin{}, id)
+
+	if err := delTx.Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}

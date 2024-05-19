@@ -40,8 +40,8 @@ func NewAuthorization(issuer string, audience string, secret string, tokenExpiry
 }
 
 type JwtUser struct {
-	ID          int64  `json:"id" binding:"required"`
-	NameSurname string `json:"name_surname" binding:"required"`
+	ID       int64  `json:"id" binding:"required"`
+	Username string `json:"user_name" binding:"required"`
 }
 
 type TokenPairs struct {
@@ -57,7 +57,7 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = user.NameSurname
+	claims["name"] = user.Username
 	claims["sub"] = strconv.Itoa(int(user.ID))
 	claims["aud"] = j.Audience
 	claims["iss"] = j.Issuer
@@ -97,7 +97,7 @@ func (j *Authorization) GetRefreshCookie(refreshToken string, ctx *gin.Context) 
 }
 
 func (j *Authorization) RefreshToken(ctx *gin.Context) {
-	userRepo := db.NewUserRepo()
+	adminRepo := db.NewAdminRepo()
 	for _, cookie := range ctx.Request.Cookies() {
 		if cookie.Name == j.CookieName {
 			claims := &Claims{}
@@ -111,19 +111,19 @@ func (j *Authorization) RefreshToken(ctx *gin.Context) {
 				return
 			}
 
-			userId, err := strconv.Atoi(claims.Subject)
+			adminId, err := strconv.Atoi(claims.Subject)
 			if err != nil {
 				ctx.JSON(http.StatusBadRequest, gin.H{"error": errors.New("cannot parse id")})
 			}
-			user, err := userRepo.GetUserById(ctx, int64(userId))
+			admin, err := adminRepo.GetAdminById(ctx, int64(adminId))
 			if err != nil {
 				ctx.JSON(http.StatusUnauthorized, gin.H{"error": errors.New("user not found")})
 				return
 			}
 
 			u := &JwtUser{
-				ID:          user.ID,
-				NameSurname: user.NameSurname,
+				ID:       admin.ID,
+				Username: admin.UserName,
 			}
 
 			tokenPairs, err := j.GenerateTokenPairs(u)

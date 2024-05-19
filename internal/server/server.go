@@ -55,6 +55,10 @@ func (server *Server) setupRouter() {
 
 	authRoutes.DELETE("/delete-user/:id", userHandler.DeleteUser)
 
+	authRoutes.PUT("/create-admin", adminHandler.CreateAdmin)
+	authRoutes.PATCH("/update-admin", adminHandler.UpdateAdmin)
+	authRoutes.DELETE("/delete-admin/:id", adminHandler.DeleteAdmin)
+
 	server.Router = router
 }
 

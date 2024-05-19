@@ -39,8 +39,8 @@ func (adm *AdminHandler) Authorization(ctx *gin.Context) {
 	}
 
 	testUser := middleware.JwtUser{
-		ID:          adminByEmail.ID,
-		NameSurname: adminByEmail.UserName,
+		ID:       adminByEmail.ID,
+		Username: adminByEmail.UserName,
 	}
 
 	tokens, err := adm.IJWTInterfaces.GenerateTokenPairs(&testUser)
