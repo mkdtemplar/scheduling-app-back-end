@@ -26,6 +26,7 @@ func (server *Server) setupRouter() {
 	var adminHandlers services.AdminHandler
 	var positionsHandlers services.PositionHandler
 	var userHandlers services.UserHandler
+	var shiftsHandlers services.ShiftHandler
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
@@ -34,6 +35,7 @@ func (server *Server) setupRouter() {
 	adminHandler := adminHandlers.AdminHandlerConstructor()
 	positionHandler := positionsHandlers.PositionHandlerConstructor()
 	userHandler := userHandlers.UserHandlerConstructor()
+	shiftHandler := shiftsHandlers.ShiftsHandlerConstructor()
 
 	router.Use(middleware.CORSMiddleware())
 
@@ -48,6 +50,7 @@ func (server *Server) setupRouter() {
 	router.GET("/user/:id", userHandler.GetUserById)
 	router.GET("/all-admins", adminHandler.AllAdmins)
 	router.GET("/get-admin/:id", adminHandler.GetAdminById)
+	router.PUT("/create-shift", shiftHandler.CreateShift)
 
 	authRoutes := router.Group("/admin").Use(adminHandler.IJWTInterfaces.AuthRequired())
 	authRoutes.PUT("/add-user", userHandler.Create)

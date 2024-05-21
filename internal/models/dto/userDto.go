@@ -8,7 +8,7 @@ import (
 type CreateUserRequest struct {
 	ID           int64     `gorm:"type:bigint;primaryKey" json:"id,string" binding:"required"`
 	NameSurname  string    `gorm:"type:text" json:"name_surname" binding:"required"`
-	Email        string    `gorm:"type:text" json:"email" binding:"required,email"`
+	Email        string    `gorm:"type:email" json:"email" binding:"required,email"`
 	Password     string    `gorm:"type:text" json:"password" binding:"required"`
 	PositionName string    `gorm:"type:text" json:"position_name" binding:"required"`
 	CreatedAt    time.Time `gorm:"type:timestamp" json:"-"`
@@ -19,7 +19,7 @@ type CreateUserRequest struct {
 type CreateUserResponse struct {
 	ID           int64     `gorm:"type:bigint;primaryKey" json:"id,string"`
 	NameSurname  string    `gorm:"type:text" json:"name_surname" binding:"required"`
-	Email        string    `gorm:"type:text" json:"email" binding:"required,email"`
+	Email        string    `gorm:"type:email" json:"email" binding:"required,email"`
 	PositionName string    `gorm:"type:text" json:"position_name" binding:"required"`
 	CreatedAt    time.Time `gorm:"type:timestamp" json:"-"`
 	PositionID   int64     `gorm:"type:bigint" json:"position_id,string"`

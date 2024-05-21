@@ -11,6 +11,7 @@ import (
 type AdminHandler api.AdminHandler
 type PositionHandler api.PositionHandler
 type UserHandler api.UserHandler
+type ShiftHandler api.ShiftsHandler
 
 func (adm *AdminHandler) AdminHandlerConstructor() *api.AdminHandler {
 	config, err := utils.LoadConfig(".")
@@ -33,4 +34,9 @@ func (i *PositionHandler) PositionHandlerConstructor() *api.PositionHandler {
 func (usr *UserHandler) UserHandlerConstructor() *api.UserHandler {
 	userRepo := db.NewUserRepo()
 	return api.NewUserHandler(userRepo)
+}
+
+func (sh *ShiftHandler) ShiftsHandlerConstructor() *api.ShiftsHandler {
+	shiftsRepo := db.NewShiftsRepo()
+	return api.NewShiftsHandler(shiftsRepo)
 }

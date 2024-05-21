@@ -26,3 +26,8 @@ type AdminHandler struct {
 	middleware.JwtUser
 	interfaces.IAdminInterfaces
 }
+
+type ShiftsHandler struct {
+	Handler
+	interfaces.IShiftsInterfaces
+}
