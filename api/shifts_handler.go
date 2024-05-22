@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/repository/interfaces"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,4 +39,29 @@ func (sh *ShiftsHandler) CreateShift(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, newShift)
+}
+
+func (sh *ShiftsHandler) GetShiftById(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	shift, err := sh.IShiftsInterfaces.GetShiftById(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, shift)
+}
+
+func (sh *ShiftsHandler) GetShiftByName(ctx *gin.Context) {
+
+	shift, err := sh.IShiftsInterfaces.GetShiftByName(ctx, ctx.Query("name"))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, shift)
 }
