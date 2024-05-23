@@ -1,3 +1,4 @@
-2,new@new.com,$2a$10$Q9AJ3K3zsIG9AGV1kIq1BuKDVIX1yBBBE/IP00HvmnVaiDtEVUqrq
-1,admin@example.com,$2a$10$r7Xd35zUGmqRjyfdLv9XduGOVaMJe0upsgIsRaPX.MbAhDJpVM3RS
-3,new2updated@new.com,$2a$10$/AL8hDfravdRzA8n4lVRjeTMNb/N4RwCmaEFIJO6/VrqLYQubM3KO
+id,user_name,password
+1,admin@admin.com,$2a$10$6aodg9QH11iB9grHmyT4tunLGvxRZMhRz.iA7tI1qrimosH1vDQ/S
+3,new3updated@new.com,$2a$10$d2C3IcEWZpx3/nmIXZabfO8VC.ehPcQrjHt0P5LAfWEzlSzwfMln2
+5,zeus@zeus.com,$2a$10$EMebkON5Rd6HtKsS2mFruu9tqwubZ23AvWqeROFFM/7zZfV/7wpw.
