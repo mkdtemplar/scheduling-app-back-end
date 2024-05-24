@@ -52,7 +52,8 @@ func (server *Server) setupRouter() {
 	router.GET("/get-admin/:id", adminHandler.GetAdminById)
 	router.PUT("/create-shift", shiftHandler.CreateShift)
 	router.GET("/get-shift/:id", shiftHandler.GetShiftById)
-	router.GET("/get-shift-name", shiftHandler.GetShiftByName)
+	router.GET("/get-shift-name/:name", shiftHandler.GetShiftByName)
+	router.PATCH("/update-shift/:id", shiftHandler.UpdateShift)
 
 	authRoutes := router.Group("/admin").Use(adminHandler.IJWTInterfaces.AuthRequired())
 	authRoutes.PUT("/add-user", userHandler.Create)

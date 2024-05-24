@@ -54,7 +54,7 @@ func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.
 
 func (p *PostgresDB) GetUserById(ctx context.Context, id int64) (*models.Users, error) {
 	user := &models.Users{}
-	err := p.DB.WithContext(ctx).Model(&models.Users{}).Where("id = ?", id).Take(&user).Error
+	err := p.DB.WithContext(ctx).Model(&models.Users{}).Where("id = ?", id).Find(&user).Error
 	if err != nil {
 		return &models.Users{}, err
 	}

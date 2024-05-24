@@ -1,12 +1,16 @@
 package api
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/repository/interfaces"
+	"scheduling-app-back-end/internal/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func NewShiftsHandler(IShiftsRepository interfaces.IShiftsInterfaces) *ShiftsHandler {
@@ -58,10 +62,59 @@ func (sh *ShiftsHandler) GetShiftById(ctx *gin.Context) {
 
 func (sh *ShiftsHandler) GetShiftByName(ctx *gin.Context) {
 
-	shift, err := sh.IShiftsInterfaces.GetShiftByName(ctx, ctx.Query("name"))
+	shift, err := sh.IShiftsInterfaces.GetShiftByName(ctx, ctx.Params.ByName("name"))
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 	ctx.JSON(http.StatusOK, shift)
+}
+
+func (sh *ShiftsHandler) UpdateShift(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	shiftFromDb, err := sh.IShiftsInterfaces.GetShiftById(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	shiftForEdit, err := utils.ParseShiftRequestBody(ctx)
+	fmt.Println(shiftForEdit)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	shiftFromDb, err = sh.IShiftsInterfaces.UpdateShift(ctx, shiftFromDb.ID, shiftForEdit.ID, shiftForEdit.Name, shiftForEdit.StartTime,
+		shiftForEdit.EndTime, shiftForEdit.PositionID, shiftForEdit.UserID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, shiftFromDb)
+}
+
+func (sh *ShiftsHandler) DeleteShift(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	err = sh.DB.Delete(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusAccepted, gin.H{"error": false, "message": "shift deleted"})
 }

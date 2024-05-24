@@ -36,3 +36,16 @@ func ParseAdminRequestBody(ctx *gin.Context) (*models.Admin, error) {
 	}
 	return admin, nil
 }
+
+func ParseShiftRequestBody(ctx *gin.Context) (*models.Shifts, error) {
+	body, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		return nil, err
+	}
+	shift := &models.Shifts{}
+	err = json.Unmarshal(body, &shift)
+	if err != nil {
+		return &models.Shifts{}, err
+	}
+	return shift, nil
+}
