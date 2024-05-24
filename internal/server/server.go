@@ -49,6 +49,7 @@ func (server *Server) setupRouter() {
 	router.GET("/all-users", userHandler.AllUsers)
 	router.GET("/user/:id", userHandler.GetUserById)
 	router.GET("/all-admins", adminHandler.AllAdmins)
+	router.GET("/all-shifts", shiftHandler.GetAllShifts)
 	router.GET("/get-admin/:id", adminHandler.GetAdminById)
 	router.GET("/get-shift/:id", shiftHandler.GetShiftById)
 	router.GET("/get-shift-name/:name", shiftHandler.GetShiftByName)

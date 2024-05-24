@@ -15,8 +15,8 @@ type GetPositionRequest struct {
 type PositionResponse struct {
 	ID           int64                 `gorm:"type:bigint;primaryKey" json:"id"`
 	PositionName string                `json:"position_name" gorm:"type:text"`
-	Users        []*CreateUserResponse `gorm:"foreignKey:PositionID;references:ID" json:"users,omitempty"`
-	Shifts       []*models.Shifts      `gorm:"foreignKey:PositionID;references:ID" json:"shifts,omitempty"`
+	Users        []*CreateUserResponse `gorm:"foreignKey:UserID;references:ID" json:"users,omitempty"`
+	Shifts       []*models.Shifts      `gorm:"foreignKey:UserID;references:ID" json:"shifts,omitempty"`
 	UsersArray   []int64               `gorm:"-" json:"users_array,omitempty"`
 }
 

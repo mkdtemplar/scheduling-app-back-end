@@ -82,7 +82,7 @@ func (i *PositionHandler) GetPositionByIdForEdit(ctx *gin.Context) {
 }
 
 func (i *PositionHandler) AllPositionsForUserAddEdit(ctx *gin.Context) {
-	var allPositions []*dto.PositionForUserCreateAndEdit
+	var allPositions []*dto.PositionResponse
 
 	positions, err := i.IPositionsRepository.AllPositionsForUserAddEdit(ctx)
 	if err != nil {
@@ -90,7 +90,7 @@ func (i *PositionHandler) AllPositionsForUserAddEdit(ctx *gin.Context) {
 		return
 	}
 	for _, position := range positions {
-		allPositions = append(allPositions, dto.PositionResponseFroUserAddEdit(position))
+		allPositions = append(allPositions, dto.NewPositionResponse(position))
 	}
 
 	ctx.JSON(http.StatusOK, allPositions)

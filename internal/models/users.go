@@ -13,6 +13,6 @@ type Users struct {
 	Shifts            []*Shifts `gorm:"foreignKey:UserID;references:ID" json:"shifts,omitempty"`
 	CreatedAt         time.Time `gorm:"type:timestamp" json:"-"`
 	UpdatedAt         time.Time `gorm:"type:timestamp" json:"-"`
-	PositionID        int64     `json:"position_id,string" binding:"required"`
+	UserID            int64     `json:"user_id,string" binding:"required"`
 	UserPositionArray []int64   `gorm:"-" json:"user_position_array,omitempty"`
 }

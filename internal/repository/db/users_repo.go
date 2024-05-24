@@ -47,7 +47,7 @@ func (p *PostgresDB) GetUserByEmail(ctx context.Context, email string) (*models.
 		Shifts:       user.Shifts,
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
-		PositionID:   user.PositionID,
+		UserID:       user.UserID,
 	}
 	return userFind, nil
 }
@@ -67,7 +67,7 @@ func (p *PostgresDB) GetUserById(ctx context.Context, id int64) (*models.Users, 
 		Shifts:       user.Shifts,
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
-		PositionID:   user.PositionID,
+		UserID:       user.UserID,
 	}
 
 	return userFind, nil
@@ -102,7 +102,7 @@ func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.
 		Shifts:       user.Shifts,
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
-		PositionID:   user.PositionID,
+		UserID:       user.UserID,
 	}
 
 	for _, position := range positions {

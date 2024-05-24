@@ -37,7 +37,7 @@ func (usr *UserHandler) Create(ctx *gin.Context) {
 		Email:        req.Email,
 		Password:     hashedPassword,
 		PositionName: req.PositionName,
-		PositionID:   req.PositionID,
+		UserID:       req.UserID,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
@@ -126,7 +126,7 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 	}
 
 	userFromDb, err = usr.IUserRepository.UpdateUser(ctx, userForEdit.ID, userForEdit.NameSurname,
-		userForEdit.Email, userForEdit.PositionName, userForEdit.PositionID)
+		userForEdit.Email, userForEdit.PositionName, userForEdit.UserID)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))

@@ -74,6 +74,17 @@ func (sh *ShiftsHandler) GetShiftByName(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, shift)
 }
 
+func (sh *ShiftsHandler) GetAllShifts(ctx *gin.Context) {
+	var shifts []*models.Shifts
+
+	shifts, err := sh.IShiftsInterfaces.GetAllShifts(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, shifts)
+}
+
 func (sh *ShiftsHandler) UpdateShift(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Params.ByName("id"))
 	if err != nil {

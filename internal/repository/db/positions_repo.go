@@ -26,7 +26,7 @@ func (p *PostgresDB) CreatePosition(ctx context.Context, position *models.Positi
 func (p *PostgresDB) AllPositions(ctx context.Context) ([]*models.Positions, error) {
 	var positions []*models.Positions
 
-	if err := p.DB.WithContext(ctx).Model(&models.Positions{}).Preload("Users").Find(&positions).Error; err != nil {
+	if err := p.DB.WithContext(ctx).Model(&models.Positions{}).Preload("Users").Preload("Shifts").Find(&positions).Error; err != nil {
 		return []*models.Positions{}, err
 	}
 
@@ -45,7 +45,7 @@ func (p *PostgresDB) GetPositionByID(ctx context.Context, id int64) (*models.Pos
 func (p *PostgresDB) GetPositionByIdForEdit(ctx context.Context, id int64) (*models.Positions, error) {
 	position := &models.Positions{}
 	var usersArray []int64
-	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Find(&position).Error; err != nil {
+	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Preload("Shifts").Find(&position).Error; err != nil {
 		return &models.Positions{}, err
 	}
 
