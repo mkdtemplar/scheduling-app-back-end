@@ -59,9 +59,12 @@ func (p *PostgresDB) GetShiftByName(ctx context.Context, name string) (*models.S
 func (p *PostgresDB) UpdateShift(ctx context.Context, id int64, idUpdated int64, name string, startTime string,
 	endTime string, positionID int64, userId int64) (*models.Shifts, error) {
 
-	shiftForUpdate, _ := p.GetShiftById(ctx, id)
+	shiftForUpdate, err := p.GetShiftById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 
-	if err := p.DB.WithContext(ctx).Model(shiftForUpdate).Where("id = ?", id).
+	if err = p.DB.WithContext(ctx).Model(shiftForUpdate).Where("id = ?", id).
 		UpdateColumns(map[string]interface{}{"id": idUpdated, "name": name, "start_time": startTime, "end_time": endTime,
 			"position_id": positionID, "user_id": userId}).Error; err != nil {
 		return &models.Shifts{}, err
