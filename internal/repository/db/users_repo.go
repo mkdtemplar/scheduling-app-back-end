@@ -89,7 +89,7 @@ func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.
 	if err != nil {
 		return nil, err
 	}
-	err = p.DB.WithContext(ctx).Model(&models.Users{}).Where("id = ?", id).Take(&user).Error
+	err = p.DB.WithContext(ctx).Model(&models.Users{}).Where("id = ?", id).First(&user).Error
 	if err != nil {
 		return &models.Users{}, err
 	}
@@ -111,14 +111,14 @@ func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.
 	return userFind, nil
 }
 
-func (p *PostgresDB) UpdateUser(ctx context.Context, id int64, nameSurname string, email string,
+func (p *PostgresDB) UpdateUser(ctx context.Context, id int64, idUpdated int64, nameSurname string, email string,
 	currentPosition string, positionId int64) (*models.Users, error) {
 
 	var userForUpdate = &models.Users{}
 
-	if err := p.DB.WithContext(ctx).Model(userForUpdate).Where("id = ?", id).
-		Updates(map[string]interface{}{"name_surname": nameSurname, "email": email,
-			"position_name": currentPosition, "position_id": positionId}).Error; err != nil {
+	if err := p.DB.Debug().WithContext(ctx).Model(userForUpdate).Where("id = ?", id).
+		Updates(map[string]interface{}{"id": idUpdated, "name_surname": nameSurname, "email": email,
+			"position_name": currentPosition, "user_id": positionId}).Error; err != nil {
 		return &models.Users{}, err
 	}
 

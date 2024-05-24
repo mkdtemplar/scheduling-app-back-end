@@ -35,7 +35,7 @@ func (p *PostgresDB) AllPositions(ctx context.Context) ([]*models.Positions, err
 
 func (p *PostgresDB) GetPositionByID(ctx context.Context, id int64) (*models.Positions, error) {
 	position := &models.Positions{}
-	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Find(&position).Error; err != nil {
+	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Preload("Shifts").Find(&position).Error; err != nil {
 		return &models.Positions{}, err
 	}
 

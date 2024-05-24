@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/models/dto"
@@ -119,21 +120,27 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
+	fmt.Println(userFromDb)
+
 	userForEdit, err := utils.ParseUserPrefRequestBody(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	userFromDb, err = usr.IUserRepository.UpdateUser(ctx, userForEdit.ID, userForEdit.NameSurname,
+	fmt.Println(userForEdit)
+
+	userUpdated, err := usr.IUserRepository.UpdateUser(ctx, userFromDb.ID, userForEdit.ID, userForEdit.NameSurname,
 		userForEdit.Email, userForEdit.PositionName, userForEdit.UserID)
+
+	fmt.Println(userUpdated)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	response := dto.NewUserResponse(userFromDb)
+	response := dto.NewUserResponse(userUpdated)
 
 	ctx.JSON(http.StatusOK, response)
 
