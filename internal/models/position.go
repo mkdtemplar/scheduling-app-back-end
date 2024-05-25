@@ -1,7 +1,7 @@
 package models
 
 type Positions struct {
-	ID           int64     `gorm:"type:bigint;primaryKey" json:"id" binding:"required"`
+	ID           int64     `gorm:"type:bigint;primaryKey" json:"id,string" binding:"required"`
 	PositionName string    `json:"position_name" gorm:"type:text"`
 	Users        []*Users  `gorm:"foreignKey:UserID;references:ID" json:"users,omitempty"`
 	Shifts       []*Shifts `gorm:"foreignKey:UserID;references:ID" json:"shifts,omitempty"`

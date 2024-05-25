@@ -24,6 +24,7 @@ func (i *PositionHandler) CreatePosition(ctx *gin.Context) {
 	}
 
 	arg := &models.Positions{
+		ID:           req.ID,
 		PositionName: req.PositionName,
 	}
 

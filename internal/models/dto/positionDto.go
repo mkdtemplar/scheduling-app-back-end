@@ -5,6 +5,7 @@ import (
 )
 
 type CreatePositionRequest struct {
+	ID           int64  `gorm:"type:bigint;primaryKey" json:"id,string" binding:"required"`
 	PositionName string `json:"position_name" gorm:"type:text"`
 }
 

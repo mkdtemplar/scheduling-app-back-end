@@ -57,7 +57,7 @@ func (server *Server) setupRouter() {
 
 	authRoutes := router.Group("/admin").Use(adminHandler.IJWTInterfaces.AuthRequired())
 	authRoutes.PUT("/add-user", userHandler.Create)
-	authRoutes.PUT("/add-position/0", positionHandler.CreatePosition)
+	authRoutes.PUT("/add-position", positionHandler.CreatePosition)
 	authRoutes.GET("/edit-position/:id", positionHandler.GetPositionByIdForEdit)
 	authRoutes.GET("/user-edit/:id", userHandler.GetUserByIdForEdit)
 	authRoutes.PATCH("/edit-user/:id", userHandler.UpdateUser)
