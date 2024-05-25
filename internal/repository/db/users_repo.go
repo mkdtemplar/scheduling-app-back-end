@@ -111,6 +111,17 @@ func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.
 	return userFind, nil
 }
 
+func (p *PostgresDB) GetUserIds(ctx context.Context) ([]*models.Users, error) {
+
+	var users []*models.Users
+
+	if err := p.DB.WithContext(ctx).Model(&models.Users{}).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
 func (p *PostgresDB) UpdateUser(ctx context.Context, id int64, idUpdated int64, nameSurname string, email string,
 	currentPosition string, positionId int64) (*models.Users, error) {
 

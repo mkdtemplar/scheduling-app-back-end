@@ -26,6 +26,11 @@ type CreateUserResponse struct {
 	UserID       int64            `gorm:"type:bigint" json:"user_id,string"`
 }
 
+type UserResponseForShift struct {
+	ID          int64  `gorm:"type:bigint;primaryKey" json:"id,string"`
+	NameSurname string `gorm:"type:text" json:"name_surname" binding:"required"`
+}
+
 func NewUserResponse(user *models.Users) *CreateUserResponse {
 	return &CreateUserResponse{
 		ID:           user.ID,
@@ -34,5 +39,12 @@ func NewUserResponse(user *models.Users) *CreateUserResponse {
 		PositionName: user.PositionName,
 		Shifts:       user.Shifts,
 		UserID:       user.UserID,
+	}
+}
+
+func NewUserResponseForShift(user *models.Users) *UserResponseForShift {
+	return &UserResponseForShift{
+		ID:          user.ID,
+		NameSurname: user.NameSurname,
 	}
 }

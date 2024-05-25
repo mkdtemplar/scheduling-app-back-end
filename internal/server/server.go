@@ -53,6 +53,7 @@ func (server *Server) setupRouter() {
 	router.GET("/get-admin/:id", adminHandler.GetAdminById)
 	router.GET("/get-shift/:id", shiftHandler.GetShiftById)
 	router.GET("/get-shift-name/:name", shiftHandler.GetShiftByName)
+	router.GET("/user-ids", userHandler.GetUserIds)
 
 	authRoutes := router.Group("/admin").Use(adminHandler.IJWTInterfaces.AuthRequired())
 	authRoutes.PUT("/add-user", userHandler.Create)

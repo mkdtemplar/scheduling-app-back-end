@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/models/dto"
@@ -120,20 +119,14 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println(userFromDb)
-
 	userForEdit, err := utils.ParseUserPrefRequestBody(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	fmt.Println(userForEdit)
-
 	userUpdated, err := usr.IUserRepository.UpdateUser(ctx, userFromDb.ID, userForEdit.ID, userForEdit.NameSurname,
 		userForEdit.Email, userForEdit.PositionName, userForEdit.UserID)
-
-	fmt.Println(userUpdated)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -144,6 +137,21 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, response)
 
+}
+
+func (usr *UserHandler) GetUserIds(ctx *gin.Context) {
+	var allIds []*dto.UserResponseForShift
+	ids, err := usr.IUserRepository.GetUserIds(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	for _, id := range ids {
+		allIds = append(allIds, dto.NewUserResponseForShift(id))
+	}
+
+	ctx.JSON(http.StatusOK, allIds)
 }
 
 func (usr *UserHandler) DeleteUser(ctx *gin.Context) {

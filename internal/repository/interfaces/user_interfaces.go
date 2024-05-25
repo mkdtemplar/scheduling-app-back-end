@@ -16,4 +16,5 @@ type IUserRepository interface {
 	UpdateUser(ctx context.Context, id int64, idUpdated int64, nameSurname string, email string,
 		currentPosition string, positionId int64) (*models.Users, error)
 	Delete(ctx context.Context, id int64) error
+	GetUserIds(ctx context.Context) ([]*models.Users, error)
 }
