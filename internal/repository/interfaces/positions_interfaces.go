@@ -11,4 +11,6 @@ type IPositionsRepository interface {
 	GetPositionByID(ctx context.Context, id int64) (*models.Positions, error)
 	GetPositionByIdForEdit(ctx context.Context, id int64) (*models.Positions, error)
 	AllPositionsForUserAddEdit(ctx context.Context) ([]*models.Positions, error)
+	UpdatePosition(ctx context.Context, id int64, idEdit int64, positionName string) (*models.Positions, error)
+	DeletePosition(ctx context.Context, id int64) error
 }

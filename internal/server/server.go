@@ -59,6 +59,8 @@ func (server *Server) setupRouter() {
 	authRoutes.PUT("/add-user", userHandler.Create)
 	authRoutes.PUT("/add-position", positionHandler.CreatePosition)
 	authRoutes.GET("/edit-position/:id", positionHandler.GetPositionByIdForEdit)
+	authRoutes.PATCH("/update-position/:id", positionHandler.UpdatePosition)
+	authRoutes.DELETE("/delete-position/:id", positionHandler.DeletePosition)
 	authRoutes.GET("/user-edit/:id", userHandler.GetUserByIdForEdit)
 	authRoutes.PATCH("/edit-user/:id", userHandler.UpdateUser)
 

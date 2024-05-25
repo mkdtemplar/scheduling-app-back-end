@@ -49,3 +49,16 @@ func ParseShiftRequestBody(ctx *gin.Context) (*models.Shifts, error) {
 	}
 	return shift, nil
 }
+
+func ParsePositionRequestBody(ctx *gin.Context) (*models.Positions, error) {
+	body, err := io.ReadAll(ctx.Request.Body)
+	if err != nil {
+		return nil, err
+	}
+	positions := &models.Positions{}
+	err = json.Unmarshal(body, &positions)
+	if err != nil {
+		return &models.Positions{}, err
+	}
+	return positions, nil
+}

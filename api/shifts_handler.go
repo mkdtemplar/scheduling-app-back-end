@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/repository/interfaces"
@@ -99,7 +98,7 @@ func (sh *ShiftsHandler) UpdateShift(ctx *gin.Context) {
 	}
 
 	shiftForEdit, err := utils.ParseShiftRequestBody(ctx)
-	fmt.Println(shiftForEdit)
+
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return

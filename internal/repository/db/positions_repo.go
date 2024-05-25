@@ -65,3 +65,29 @@ func (p *PostgresDB) AllPositionsForUserAddEdit(ctx context.Context) ([]*models.
 
 	return positions, nil
 }
+
+func (p *PostgresDB) UpdatePosition(ctx context.Context, id int64, idEdit int64, positionName string) (*models.Positions, error) {
+	positionForUpdate, err := p.GetPositionByID(ctx, id)
+	if err != nil {
+		return &models.Positions{}, err
+	}
+
+	if err = p.DB.WithContext(ctx).Model(positionForUpdate).Where("id = ?", id).
+		UpdateColumns(map[string]interface{}{"id": idEdit, "position_name": positionName}).Error; err != nil {
+		return &models.Positions{}, err
+	}
+
+	return positionForUpdate, nil
+}
+
+func (p *PostgresDB) DeletePosition(ctx context.Context, id int64) error {
+	tx := p.DB.WithContext(ctx).Begin()
+
+	if err := tx.WithContext(ctx).Model(&models.Positions{}).Where("id = ?", id).Delete(&models.Positions{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	} else {
+		tx.Commit()
+	}
+	return nil
+}

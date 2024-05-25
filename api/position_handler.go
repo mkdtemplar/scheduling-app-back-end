@@ -5,6 +5,7 @@ import (
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/models/dto"
 	"scheduling-app-back-end/internal/repository/interfaces"
+	"scheduling-app-back-end/internal/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -95,4 +96,47 @@ func (i *PositionHandler) AllPositionsForUserAddEdit(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, allPositions)
+}
+
+func (i *PositionHandler) UpdatePosition(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	positionFromDb, err := i.IPositionsRepository.GetPositionByID(ctx, int64(id))
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, errorResponse(err))
+		return
+	}
+
+	positionForEdit, err := utils.ParsePositionRequestBody(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	positionFromDb, err = i.IPositionsRepository.UpdatePosition(ctx, positionFromDb.ID, positionForEdit.ID, positionForEdit.PositionName)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, positionFromDb)
+}
+
+func (i *PositionHandler) DeletePosition(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Params.ByName("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if err = i.IPositionsRepository.DeletePosition(ctx, int64(id)); err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusAccepted, gin.H{"error": false, "message": "position deleted"})
 }
