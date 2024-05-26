@@ -31,3 +31,8 @@ type ShiftsHandler struct {
 	Handler
 	interfaces.IShiftsInterfaces
 }
+
+type AnnualLeaveHandler struct {
+	Handler
+	interfaces.IAnnualLeaveRepository
+}
