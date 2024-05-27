@@ -13,6 +13,11 @@ type CreateAdminResponse struct {
 	UserName string `gorm:"type:varchar(255);not null" json:"user_name"`
 }
 
+type AdminAuthorizationRequest struct {
+	UserName string `gorm:"type:varchar(255);not null" json:"user_name" binding:"required,email"`
+	Password string `gorm:"type:varchar(255);not null" json:"password" binding:"required"`
+}
+
 func NewAdminResponse(newAdmin *models.Admin) *CreateAdminResponse {
 	return &CreateAdminResponse{
 		ID:       newAdmin.ID,

@@ -16,14 +16,19 @@ func (adm *AdminHandler) Authorization(ctx *gin.Context) {
 		Username string `json:"user_name" binding:"required" gorm:"type:email"`
 		Password string `json:"password" binding:"required" gorm:"type:password"`
 	}
-
-	if err := ctx.ShouldBindJSON(&requestPayload); err != nil {
+	requestBody, err := utils.ParseAdminAuthorizationBody(ctx)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	if requestPayload.Username == "" || requestPayload.Password == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Username & Password required"})
+	if requestBody.UserName == "" || requestBody.Password == "" {
+		ctx.JSON(http.StatusBadRequest, errorResponse(errors.New("username or password is empty")))
+		return
+	}
+
+	if err := ctx.ShouldBindJSON(&requestPayload); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
