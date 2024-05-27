@@ -22,6 +22,11 @@ func (adm *AdminHandler) Authorization(ctx *gin.Context) {
 		return
 	}
 
+	if requestPayload.Username == "" || requestPayload.Password == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Username & Password required"})
+		return
+	}
+
 	adminByEmail, err := adm.IAdminInterfaces.GetAdminByEmail(ctx, requestPayload.Username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
