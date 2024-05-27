@@ -2,7 +2,6 @@ package server
 
 import (
 	"scheduling-app-back-end/internal/middleware"
-	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/services"
 	"scheduling-app-back-end/internal/utils"
 
@@ -10,15 +9,14 @@ import (
 )
 
 type Server struct {
-	config   utils.Config
-	Router   *gin.Engine
-	auth     middleware.IJWTInterfaces
-	MailChan chan models.MailData
+	config utils.Config
+	Router *gin.Engine
+	auth   middleware.IJWTInterfaces
 }
 
-func NewServer(config utils.Config, mailChan chan models.MailData) (*Server, error) {
+func NewServer(config utils.Config) (*Server, error) {
 
-	server := &Server{config: config, MailChan: mailChan}
+	server := &Server{config: config}
 
 	server.setupRouter()
 	return server, nil

@@ -1,10 +1,12 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/models/dto"
 	"scheduling-app-back-end/internal/repository/interfaces"
+	"scheduling-app-back-end/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,4 +40,26 @@ func (a *AnnualLeaveHandler) CreateAnnualLeave(ctx *gin.Context) {
 
 	response := dto.NewAnnualLeaveResponse(newAnnualLeave)
 	ctx.JSON(http.StatusOK, response)
+
+	htmlMessage := fmt.Sprintf(`
+		<strong>Annual Leave Request Send for Approval</strong><br>
+		This email confirms that user with email %s send request for annual leave from %s until %s
+`, response.Email, response.StartDate, response.EndDate)
+
+	msg := models.MailData{
+		To:      response.Email,
+		From:    "admin@example.com",
+		Subject: "Annual Leave Confirmation",
+		Content: htmlMessage,
+	}
+
+	utils.SendMsg(msg)
+
+	msg = models.MailData{
+		To:      "admin@example.com",
+		From:    response.Email,
+		Subject: "Annual Leave Confirmation",
+		Content: htmlMessage,
+	}
+	utils.SendMsg(msg)
 }

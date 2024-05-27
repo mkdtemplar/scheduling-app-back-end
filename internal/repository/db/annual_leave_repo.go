@@ -16,7 +16,7 @@ func (p *PostgresDB) CreateAnnualLeave(ctx context.Context, annualLeave *models.
 		return nil, errors.New("AnnualLeave is empty")
 	}
 
-	if err := p.DB.WithContext(ctx).Model(&models.AnnualLeave{}).Create(annualLeave).Error; err != nil {
+	if err := p.DB.WithContext(ctx).Model(&models.AnnualLeave{}).Create(&annualLeave).Error; err != nil {
 		return nil, err
 	}
 	return annualLeave, nil
