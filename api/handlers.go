@@ -12,7 +12,7 @@ type Handler struct {
 
 type UserHandler struct {
 	Handler
-	interfaces.IUserRepository
+	interfaces.IUserInterfaces
 }
 
 type PositionHandler struct {

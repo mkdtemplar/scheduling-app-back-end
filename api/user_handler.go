@@ -12,9 +12,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewUserHandler(IUserRepository interfaces.IUserRepository) *UserHandler {
+func NewUserHandler(IUserRepository interfaces.IUserInterfaces) *UserHandler {
 	return &UserHandler{
-		IUserRepository: IUserRepository,
+		IUserInterfaces: IUserRepository,
 	}
 }
 
@@ -42,7 +42,7 @@ func (usr *UserHandler) Create(ctx *gin.Context) {
 		UpdatedAt:    time.Now(),
 	}
 
-	newUser, err := usr.IUserRepository.CreateUser(ctx, arg)
+	newUser, err := usr.IUserInterfaces.CreateUser(ctx, arg)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -57,7 +57,7 @@ func (usr *UserHandler) AllUsers(ctx *gin.Context) {
 
 	var allUsers []*dto.CreateUserResponse
 
-	users, err := usr.IUserRepository.AllUsers(ctx)
+	users, err := usr.IUserInterfaces.AllUsers(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -77,7 +77,7 @@ func (usr *UserHandler) GetUserById(ctx *gin.Context) {
 		return
 	}
 
-	userById, err := usr.IUserRepository.GetUserById(ctx, int64(id))
+	userById, err := usr.IUserInterfaces.GetUserById(ctx, int64(id))
 	if err != nil {
 		ctx.JSON(http.StatusNoContent, errorResponse(err))
 		return
@@ -95,7 +95,7 @@ func (usr *UserHandler) GetUserByIdForEdit(ctx *gin.Context) {
 		return
 	}
 
-	userForEdit, err := usr.IUserRepository.GetUserByIdForEdit(ctx, int64(id))
+	userForEdit, err := usr.IUserInterfaces.GetUserByIdForEdit(ctx, int64(id))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -113,7 +113,7 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	userFromDb, err := usr.IUserRepository.GetUserByIdForEdit(ctx, int64(id))
+	userFromDb, err := usr.IUserInterfaces.GetUserByIdForEdit(ctx, int64(id))
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 		return
@@ -125,7 +125,7 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	userUpdated, err := usr.IUserRepository.UpdateUser(ctx, userFromDb.ID, userForEdit.ID, userForEdit.NameSurname,
+	userUpdated, err := usr.IUserInterfaces.UpdateUser(ctx, userFromDb.ID, userForEdit.ID, userForEdit.NameSurname,
 		userForEdit.Email, userForEdit.PositionName, userForEdit.UserID)
 
 	if err != nil {
@@ -141,7 +141,7 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 
 func (usr *UserHandler) GetUserIds(ctx *gin.Context) {
 	var allIds []*dto.UserResponseForShift
-	ids, err := usr.IUserRepository.GetUserIds(ctx)
+	ids, err := usr.IUserInterfaces.GetUserIds(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -161,7 +161,7 @@ func (usr *UserHandler) DeleteUser(ctx *gin.Context) {
 		return
 	}
 
-	err = usr.IUserRepository.Delete(ctx, int64(id))
+	err = usr.IUserInterfaces.Delete(ctx, int64(id))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return

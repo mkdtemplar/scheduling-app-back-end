@@ -6,7 +6,6 @@ import (
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/repository/interfaces"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -14,7 +13,7 @@ type PostgresDB struct {
 	DB *gorm.DB
 }
 
-func NewUserRepo() interfaces.IUserRepository {
+func NewUserRepo() interfaces.IUserInterfaces {
 	return &PostgresDB{DB: GetDb()}
 }
 
@@ -73,7 +72,7 @@ func (p *PostgresDB) GetUserById(ctx context.Context, id int64) (*models.Users, 
 	return userFind, nil
 }
 
-func (p *PostgresDB) AllUsers(ctx *gin.Context) ([]*models.Users, error) {
+func (p *PostgresDB) AllUsers(ctx context.Context) ([]*models.Users, error) {
 	var users []*models.Users
 	err := p.DB.WithContext(ctx).Model(&models.Users{}).Preload("Shifts").Find(&users).Error
 	if err != nil {
