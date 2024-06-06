@@ -130,7 +130,8 @@ func (j *Authorization) RefreshToken(ctx *gin.Context) {
 			}
 
 			ctx.SetSameSite(http.SameSiteStrictMode)
-			ctx.SetCookie(j.CookieName, tokenPairs.Token, int(j.RefreshExpiry.Seconds()), j.CookiePath, j.CookieDomain, true, true)
+			ctx.SetCookie(j.CookieName, tokenPairs.Token, int(j.RefreshExpiry.Seconds()), j.CookiePath,
+				j.CookieDomain, true, true)
 
 			ctx.JSON(http.StatusOK, tokenPairs)
 
