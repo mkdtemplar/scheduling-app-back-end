@@ -3,7 +3,6 @@ package middleware
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"scheduling-app-back-end/internal/repository/db"
 	"strconv"
@@ -63,7 +62,6 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 	claims["iss"] = j.Issuer
 	claims["iat"] = time.Now().UTC().Unix()
 	claims["typ"] = "JWT"
-
 	claims["exp"] = time.Now().UTC().Add(j.TokenExpiry).Unix()
 
 	signedAccessToken, err := token.SignedString([]byte(j.JWTSecret))
@@ -87,7 +85,6 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 		RefreshToken: signedRefreshToken,
 	}
 
-	log.Println(claims["name"])
 	return tokenPairs, nil
 }
 
