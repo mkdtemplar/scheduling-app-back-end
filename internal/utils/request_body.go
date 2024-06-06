@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"scheduling-app-back-end/internal/models"
-	"scheduling-app-back-end/internal/models/dto"
 
 	"github.com/gin-gonic/gin"
 )
@@ -64,16 +63,16 @@ func ParsePositionRequestBody(ctx *gin.Context) (*models.Positions, error) {
 	return positions, nil
 }
 
-func ParseAdminAuthorizationBody(ctx *gin.Context) (*dto.AdminAuthorizationRequest, error) {
+func ParseAdminAuthorizationBody(ctx *gin.Context) (*models.Admin, error) {
 	body, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	admin := &dto.AdminAuthorizationRequest{}
+	admin := &models.Admin{}
 	err = json.Unmarshal(body, &admin)
 	if err != nil {
-		return &dto.AdminAuthorizationRequest{}, err
+		return &models.Admin{}, err
 	}
 	return admin, nil
 }
