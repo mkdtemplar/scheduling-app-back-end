@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"scheduling-app-back-end/internal/middleware"
 	"scheduling-app-back-end/internal/utils"
@@ -12,15 +13,13 @@ import (
 
 func (adm *AdminHandler) Authorization(ctx *gin.Context) {
 
-	//var requestPayload struct {
-	//	Username string `json:"user_name" binding:"required" gorm:"type:email"`
-	//	Password string `json:"password" binding:"required" gorm:"type:password"`
-	//}
+	var requestPayload struct {
+		Username string `json:"user_name" binding:"required" gorm:"type:email"`
+		Password string `json:"password" binding:"required" gorm:"type:password"`
+	}
 
-	payload, err := utils.ParseAdminRequestBody(ctx)
-
-	if err = ctx.ShouldBindJSON(&payload); err != nil {
-		if payload.UserName == "" || payload.Password == "" {
+	if err := ctx.ShouldBindJSON(&requestPayload); err != nil {
+		if requestPayload.Username == "" || requestPayload.Password == "" {
 			ctx.JSON(http.StatusBadRequest, errorResponse(errors.New("username or password is empty")))
 			return
 		}
@@ -28,7 +27,10 @@ func (adm *AdminHandler) Authorization(ctx *gin.Context) {
 		return
 	}
 
-	adminByEmail, err := adm.IAdminInterfaces.GetAdminByEmail(ctx, payload.UserName)
+	fmt.Println(requestPayload.Username, requestPayload.Password)
+
+	adminByEmail, err := adm.IAdminInterfaces.GetAdminByEmail(ctx, requestPayload.Username)
+	fmt.Println(adminByEmail)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("invalid credentials")))
@@ -38,7 +40,7 @@ func (adm *AdminHandler) Authorization(ctx *gin.Context) {
 		return
 	}
 
-	valid, err := utils.CheckPassword(payload.Password, adminByEmail.Password)
+	valid, err := utils.CheckPassword(requestPayload.Password, adminByEmail.Password)
 	if err != nil || !valid {
 		ctx.JSON(http.StatusBadRequest, errorResponse(errors.New("invalid credentials")))
 		return
