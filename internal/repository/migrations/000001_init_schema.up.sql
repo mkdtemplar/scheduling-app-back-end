@@ -1,17 +1,9 @@
-create table if not exists public.admins
-(
-    id        bigint       not null
-        primary key,
-    user_name varchar(255) not null,
-    password  varchar(255) not null
-);
+create database schedules_data
+    with owner postgres;
 
-alter table public.admins
-    owner to postgres;
-
-create table if not exists public.positions
+create table public.positions
 (
-    id            bigint not null
+    id            bigserial
         primary key,
     position_name text
 );
@@ -19,9 +11,9 @@ create table if not exists public.positions
 alter table public.positions
     owner to postgres;
 
-create table if not exists public.users
+create table public.users
 (
-    id            bigint not null
+    id            bigserial
         primary key,
     name_surname  text,
     email         text,
@@ -29,7 +21,7 @@ create table if not exists public.users
     position_name text,
     created_at    timestamp,
     updated_at    timestamp,
-    position_id   bigint
+    user_id       bigint
         constraint fk_positions_users
             references public.positions
 );
@@ -37,14 +29,13 @@ create table if not exists public.users
 alter table public.users
     owner to postgres;
 
-
-create table if not exists public.shifts
+create table public.shifts
 (
     id          bigserial
         primary key,
-    name        varchar(5),
-    start_time  timestamp with time zone,
-    end_time    timestamp with time zone,
+    name        varchar(15),
+    start_time  time,
+    end_time    time,
     position_id bigint
         constraint fk_positions_shifts
             references public.positions,
@@ -55,3 +46,28 @@ create table if not exists public.shifts
 
 alter table public.shifts
     owner to postgres;
+
+create table public.admins
+(
+    id        bigserial
+        primary key,
+    user_name varchar(255) not null,
+    password  varchar(255) not null
+);
+
+alter table public.admins
+    owner to postgres;
+
+create table public.annual_leaves
+(
+    id            bigserial
+        primary key,
+    email         text,
+    position_name text,
+    start_date    date,
+    end_date      date
+);
+
+alter table public.annual_leaves
+    owner to postgres;
+

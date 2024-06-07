@@ -6,4 +6,5 @@ type Positions struct {
 	Users        []*Users  `gorm:"foreignKey:UserID;references:ID" json:"users,omitempty"`
 	Shifts       []*Shifts `gorm:"foreignKey:PositionID;references:ID" json:"shifts,omitempty"`
 	UsersArray   []int64   `gorm:"-" json:"users_array,omitempty"`
+	PositionID   int64     `json:"position_id,string" binding:"required"`
 }
