@@ -1,0 +1,4 @@
+id,name,start_time,end_time,position_id,user_id
+1,Day,08:00:00,16:00:00,1,1
+2,Evening,16:00:00,00:00:00,1,1
+3,Night,00:00:00,08:00:00,1,1

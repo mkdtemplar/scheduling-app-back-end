@@ -1,0 +1,4 @@
+id,name_surname,email,password,position_name,created_at,updated_at,position_id
+1234,Athena Goodies,athena@athena.com,$2a$10$./rdCnO6uCOsGL7aIf/oNu1sMnRkhmU73rJJzY5p451wSElGvX43C,Vip Entrance,2024-05-18 12:51:09.755045,2024-05-18 12:51:09.755045,1
+1,Thor Thunderbolt,thor@example.com,$2a$10$Lt4EkWZ25EMtpJpTx79.re.WivE7ui56rJPCKQ.J5Kkzsj5fOdWsm,God of Tunder,2024-05-06 14:16:23.302233,2024-05-06 14:16:23.302233,1
+12,MarsUpdated2 God,mars@mars.com,$2a$10$DvGrfu4vqVcFhMXLGCPMDuyM/5cokV9cc72cD3b.BjDhbu8w6cm.C,God of War,2024-05-15 17:47:10.044972,2024-05-20 09:46:39.317120,1
