@@ -1,13 +1,6 @@
 create database schedules_data
     with owner postgres;
 
-create table public.schema_migrations
-(
-    version bigint  not null
-        primary key,
-    dirty   boolean not null
-);
-
 alter table public.schema_migrations
     owner to postgres;
 
