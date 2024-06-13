@@ -30,8 +30,7 @@ alter table public.annual_leaves
 
 create table public.schedules
 (
-    id         bigserial
-        primary key,
+    id         bigserial primary key,
     start_date timestamp with time zone,
     end_date   timestamp with time zone
 );
@@ -41,12 +40,9 @@ alter table public.schedules
 
 create table public.positions
 (
-    id            bigserial
-        primary key,
+    id            bigserial primary key,
     position_name text,
-    position_id   bigint
-        constraint fk_schedules_positions
-            references public.schedules
+    position_id   bigint constraint fk_schedules_positions references public.schedules
 );
 
 alter table public.positions
@@ -54,17 +50,14 @@ alter table public.positions
 
 create table public.users
 (
-    id            bigserial
-        primary key,
+    id            bigserial primary key,
     name_surname  text,
     email         text,
     password      text,
     position_name text,
     created_at    timestamp,
     updated_at    timestamp,
-    user_id       bigint
-        constraint fk_positions_users
-            references public.positions
+    user_id       bigint constraint fk_positions_users references public.positions
 );
 
 alter table public.users
@@ -77,12 +70,8 @@ create table public.shifts
     name        varchar(15),
     start_time  time,
     end_time    time,
-    position_id bigint
-        constraint fk_positions_shifts
-            references public.positions,
-    user_id     bigint
-        constraint fk_users_shifts
-            references public.users
+    position_id bigint constraint fk_positions_shifts references public.positions,
+    user_id     bigint constraint fk_users_shifts references public.users
 );
 
 alter table public.shifts
