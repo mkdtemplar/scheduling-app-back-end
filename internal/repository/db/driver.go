@@ -27,7 +27,7 @@ func ConnectToPostgres() {
 		fmt.Println("We are connected to the database")
 	}
 
-	err = dbConn.AutoMigrate(&models.Schedule{}, &models.Positions{}, &models.Users{}, &models.Shifts{},
+	err = dbConn.AutoMigrate(&models.DailySchedule{}, &models.Positions{}, &models.Users{}, &models.Shifts{},
 		&models.Admin{}, &models.AnnualLeave{})
 	if err != nil {
 		log.Fatal(err)
