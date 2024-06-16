@@ -28,6 +28,7 @@ func (server *Server) setupRouter() {
 	var userHandlers services.UserHandler
 	var shiftsHandlers services.ShiftHandler
 	var annualLeaveHandlers services.AnnualLeaveHandler
+	var dailyScheduleHandlers services.DailyScheduleHandler
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
@@ -38,6 +39,7 @@ func (server *Server) setupRouter() {
 	userHandler := userHandlers.UserHandlerConstructor()
 	shiftHandler := shiftsHandlers.ShiftsHandlerConstructor()
 	annualLeaveHandler := annualLeaveHandlers.AnnualLeaveConstructor()
+	dailyScheduleHandler := dailyScheduleHandlers.DailyScheduleConstructor()
 
 	router.Use(middleware.CORSMiddleware())
 
@@ -57,6 +59,8 @@ func (server *Server) setupRouter() {
 	router.GET("/get-shift-name/:name", shiftHandler.GetShiftByName)
 	router.GET("/user-ids", userHandler.GetUserIds)
 	router.PUT("/create-annual-leave", annualLeaveHandler.CreateAnnualLeave)
+
+	router.PUT("/create-daly-schedule", dailyScheduleHandler.CreateDailySchedule)
 
 	authRoutes := router.Group("/admin").Use(adminHandler.IJWTInterfaces.AuthRequired())
 	authRoutes.PUT("/add-user", userHandler.Create)

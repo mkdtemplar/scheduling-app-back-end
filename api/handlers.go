@@ -36,3 +36,8 @@ type AnnualLeaveHandler struct {
 	Handler
 	interfaces.IAnnualLeaveInterfaces
 }
+
+type DailyScheduleHandlers struct {
+	Handler
+	interfaces.IDailyScheduleInterfaces
+}

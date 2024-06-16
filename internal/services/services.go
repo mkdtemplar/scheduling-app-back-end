@@ -13,6 +13,7 @@ type PositionHandler api.PositionHandler
 type UserHandler api.UserHandler
 type ShiftHandler api.ShiftsHandler
 type AnnualLeaveHandler api.AnnualLeaveHandler
+type DailyScheduleHandler api.DailyScheduleHandlers
 
 func (adm *AdminHandler) AdminHandlerConstructor() *api.AdminHandler {
 	config, err := utils.LoadConfig(".")
@@ -45,4 +46,9 @@ func (sh *ShiftHandler) ShiftsHandlerConstructor() *api.ShiftsHandler {
 func (a *AnnualLeaveHandler) AnnualLeaveConstructor() *api.AnnualLeaveHandler {
 	annualLeaveRepo := db.NewAnnualLeaveRepo()
 	return api.NewAnnualLeaveHandler(annualLeaveRepo)
+}
+
+func (h *DailyScheduleHandler) DailyScheduleConstructor() *api.DailyScheduleHandlers {
+	dailyScheduleRepo := db.NewDailyScheduleRepo()
+	return api.NewDailyScheduleHandler(dailyScheduleRepo)
 }
