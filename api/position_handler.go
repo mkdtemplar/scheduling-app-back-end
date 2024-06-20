@@ -56,13 +56,18 @@ func (i *PositionHandler) AllPositions(ctx *gin.Context) {
 }
 
 func (i *PositionHandler) AllPositionsForDailySchedule(ctx *gin.Context) {
-
+	var allPositionsForDailySchedules []*dto.PositionForDailyScheduleResponse
 	allPositions, err := i.IPositionsRepository.AllPositionsForDailySchedule(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, allPositions)
+
+	for _, position := range allPositions {
+		allPositionsForDailySchedules = append(allPositionsForDailySchedules, dto.NewPositionForDailyScheduleResponse(position))
+	}
+
+	ctx.JSON(http.StatusOK, allPositionsForDailySchedules)
 }
 
 func (i *PositionHandler) GetPositionById(ctx *gin.Context) {

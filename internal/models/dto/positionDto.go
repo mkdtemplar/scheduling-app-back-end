@@ -26,6 +26,10 @@ type PositionForUserCreateAndEdit struct {
 	PositionName string `json:"position_name" gorm:"type:text"`
 }
 
+type PositionForDailyScheduleResponse struct {
+	PositionName string `json:"position_name" gorm:"type:text"`
+}
+
 func NewPositionResponse(positions *models.Positions) *PositionResponse {
 	var allUsers []*CreateUserResponse
 	for _, u := range positions.Users {
@@ -44,6 +48,7 @@ func NewPositionResponse(positions *models.Positions) *PositionResponse {
 	return response
 }
 
-func PositionResponseFroUserAddEdit(positions *models.Positions) *PositionForUserCreateAndEdit {
-	return &PositionForUserCreateAndEdit{ID: positions.ID, PositionName: positions.PositionName}
+func NewPositionForDailyScheduleResponse(positions *models.Positions) *PositionForDailyScheduleResponse {
+	response := &PositionForDailyScheduleResponse{PositionName: positions.PositionName}
+	return response
 }
