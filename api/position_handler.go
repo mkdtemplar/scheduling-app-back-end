@@ -55,6 +55,16 @@ func (i *PositionHandler) AllPositions(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, allPositions)
 }
 
+func (i *PositionHandler) AllPositionsForDailySchedule(ctx *gin.Context) {
+
+	allPositions, err := i.IPositionsRepository.AllPositionsForDailySchedule(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, allPositions)
+}
+
 func (i *PositionHandler) GetPositionById(ctx *gin.Context) {
 	var req dto.GetPositionRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {

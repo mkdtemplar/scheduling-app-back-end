@@ -50,6 +50,7 @@ func (server *Server) setupRouter() {
 	router.GET("/positions", positionHandler.AllPositions)
 	router.GET("/position/:id", positionHandler.GetPositionById)
 	router.GET("/position-for-user", positionHandler.AllPositionsForUserAddEdit)
+	router.GET("/positions-daily-schedule", positionHandler.AllPositionsForDailySchedule)
 	router.GET("/all-users", userHandler.AllUsers)
 	router.GET("/user/:id", userHandler.GetUserById)
 	router.GET("/all-admins", adminHandler.AllAdmins)
