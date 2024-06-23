@@ -60,6 +60,8 @@ func (server *Server) setupRouter() {
 	router.GET("/get-shift-name/:name", shiftHandler.GetShiftByName)
 	router.GET("/user-ids", userHandler.GetUserIds)
 	router.PUT("/create-annual-leave", annualLeaveHandler.CreateAnnualLeave)
+	router.GET("/daily-schedule/:id", dailyScheduleHandler.GetDailyScheduleById)
+	router.GET("/all-daily-schedules", dailyScheduleHandler.GetAllDailySchedules)
 
 	authRoutes := router.Group("/admin").Use(adminHandler.IJWTInterfaces.AuthRequired())
 	authRoutes.PUT("/add-user", userHandler.Create)
@@ -81,6 +83,7 @@ func (server *Server) setupRouter() {
 	authRoutes.PATCH("/update-shift/:id", shiftHandler.UpdateShift)
 	authRoutes.DELETE("/delete-shift/:id", shiftHandler.DeleteShift)
 	authRoutes.PUT("/create-daly-schedule", dailyScheduleHandler.CreateDailySchedule)
+	//authRoutes.GET("/all-daily-schedules", dailyScheduleHandler.GetAllDailySchedules)
 
 	server.Router = router
 }
