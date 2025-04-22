@@ -11,4 +11,5 @@ type IJWTInterfaces interface {
 	Logout(ctx *gin.Context)
 	GetTokenFromHeaderAndVerify(ctx *gin.Context) (string, *Claims, error)
 	AuthRequired() gin.HandlerFunc
+	AuthStatus(ctx *gin.Context)
 }

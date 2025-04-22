@@ -44,6 +44,7 @@ func (server *Server) setupRouter() {
 	router.Use(middleware.CORSMiddleware())
 
 	router.GET("/")
+	router.GET("/auth/status", adminHandler.AuthStatus)
 	router.POST("/authenticate", adminHandler.Authorization)
 	router.GET("/refresh", adminHandler.RefreshToken)
 	router.GET("/logout", adminHandler.Logout)

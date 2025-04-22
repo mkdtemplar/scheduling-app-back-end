@@ -196,3 +196,27 @@ func (j *Authorization) AuthRequired() gin.HandlerFunc {
 		c.Next()
 	}
 }
+func (j *Authorization) AuthStatus(ctx *gin.Context) {
+	for _, cookie := range ctx.Request.Cookies() {
+		if cookie.Name == j.CookieName {
+			claims := &Claims{}
+			refreshToken := cookie.Value
+
+			_, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
+				return []byte(j.JWTSecret), nil
+			})
+			if err != nil {
+				ctx.JSON(http.StatusUnauthorized, gin.H{"isLoggedIn": false})
+				return
+			}
+
+			ctx.JSON(http.StatusOK, gin.H{
+				"isLoggedIn": true,
+				"userId":     claims.Subject,
+			})
+			return
+		}
+	}
+
+	ctx.JSON(http.StatusUnauthorized, gin.H{"isLoggedIn": false})
+}
