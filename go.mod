@@ -1,10 +1,10 @@
 module scheduling-app-back-end
 
-go 1.22
+go 1.24
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.19.0
 	github.com/xhit/go-simple-mail/v2 v2.16.0

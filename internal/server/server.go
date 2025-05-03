@@ -83,7 +83,7 @@ func (server *Server) setupRouter() {
 	authRoutes.PUT("/create-shift", shiftHandler.CreateShift)
 	authRoutes.PATCH("/update-shift/:id", shiftHandler.UpdateShift)
 	authRoutes.DELETE("/delete-shift/:id", shiftHandler.DeleteShift)
-	authRoutes.PUT("/create-daly-schedule", dailyScheduleHandler.CreateDailySchedule)
+	authRoutes.PUT("/create-daily-schedule", dailyScheduleHandler.CreateDailySchedule)
 	//authRoutes.GET("/all-daily-schedules", dailyScheduleHandler.GetAllDailySchedules)
 
 	server.Router = router
