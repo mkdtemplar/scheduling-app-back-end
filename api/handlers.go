@@ -41,3 +41,9 @@ type DailyScheduleHandlers struct {
 	Handler
 	interfaces.IDailyScheduleInterfaces
 }
+type DailyAssignmentsHandler struct {
+	Handler
+	positionsRepo interfaces.IPositionsRepository
+	dailyRepo     interfaces.IDailyAssignmentsRepository
+	from          string
+}

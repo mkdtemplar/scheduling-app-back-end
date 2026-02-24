@@ -6,6 +6,7 @@ import (
 	"scheduling-app-back-end/internal/middleware"
 	"scheduling-app-back-end/internal/repository/db"
 	"scheduling-app-back-end/internal/utils"
+	"strings"
 )
 
 type AdminHandler api.AdminHandler
@@ -14,6 +15,7 @@ type UserHandler api.UserHandler
 type ShiftHandler api.ShiftsHandler
 type AnnualLeaveHandler api.AnnualLeaveHandler
 type DailyScheduleHandler api.DailyScheduleHandlers
+type DailyAssignmentsHandler api.DailyAssignmentsHandler
 
 func (adm *AdminHandler) AdminHandlerConstructor() *api.AdminHandler {
 	config, err := utils.LoadConfig(".")
@@ -51,4 +53,16 @@ func (a *AnnualLeaveHandler) AnnualLeaveConstructor() *api.AnnualLeaveHandler {
 func (h *DailyScheduleHandler) DailyScheduleConstructor() *api.DailyScheduleHandlers {
 	dailyScheduleRepo := db.NewDailyScheduleRepo()
 	return api.NewDailyScheduleHandler(dailyScheduleRepo)
+}
+
+func (h *DailyAssignmentsHandler) DailyAssignmentsConstructor() *api.DailyAssignmentsHandler {
+
+	positionRepo := db.NewPositionRepo()
+	dailyRepo := db.NewDailyAssignmentsRepo()
+	from := strings.TrimSpace(api.SenderEmail)
+	if from == "" {
+		from = "Scheduling App <no-reply@scheduling.local>"
+	}
+
+	return api.NewDailyAssignmentsHandler(positionRepo, dailyRepo, from)
 }

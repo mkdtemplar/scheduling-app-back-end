@@ -150,3 +150,13 @@ func (p *PostgresDB) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+func (p *PostgresDB) FindUsersByPositionName(positionName string) ([]models.Users, error) {
+	var users []models.Users
+	err := p.DB.Model(&models.Users{}).Where("position_name = ?", positionName).Find(&users).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}

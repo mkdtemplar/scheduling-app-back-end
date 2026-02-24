@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -16,6 +17,7 @@ type Config struct {
 	CookieDomain  string        `mapstructure:"COOKIE_DOMAIN"`
 	CookiePath    string        `mapstructure:"COOKIE_PATH"`
 	CookieName    string        `mapstructure:"COOKIE_NAME"`
+	EmailFrom     string        `mapstructure:"EMAIL_FROM"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
@@ -24,7 +26,9 @@ func LoadConfig(path string) (config Config, err error) {
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
-
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	_ = viper.BindEnv("EMAIL_FROM")
+	viper.SetDefault("EMAIL_FROM", "Scheduling App <no-reply@scheduling.local>")
 	if err = viper.ReadInConfig(); err != nil {
 		return
 	}

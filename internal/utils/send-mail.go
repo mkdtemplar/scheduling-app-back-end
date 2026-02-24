@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"scheduling-app-back-end/internal/models"
 	"time"
@@ -9,6 +10,10 @@ import (
 )
 
 func SendMsg(m models.MailData) {
+	_ = SendMsgErr(m)
+}
+
+func SendMsgErr(m models.MailData) error {
 	server := mail.NewSMTPClient()
 	server.Host = "localhost"
 	server.Port = 1025
@@ -19,16 +24,18 @@ func SendMsg(m models.MailData) {
 	client, err := server.Connect()
 	if err != nil {
 		log.Println(err)
+		return fmt.Errorf("smtp connect: %w", err)
 	}
 
 	email := mail.NewMSG()
 	email.SetFrom(m.From).AddTo(m.To).SetSubject(m.Subject)
 	email.SetBody(mail.TextHTML, m.Content)
 
-	err = email.Send(client)
-	if err != nil {
+	if err := email.Send(client); err != nil {
 		log.Println(err)
-	} else {
-		log.Println("Email sent")
+		return fmt.Errorf("send mail: %w", err)
 	}
+
+	log.Println("Email sent:", m.To)
+	return nil
 }

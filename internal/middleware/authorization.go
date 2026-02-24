@@ -49,6 +49,7 @@ type TokenPairs struct {
 }
 
 type Claims struct {
+	Name string `json:"name"`
 	jwt.RegisteredClaims
 }
 
@@ -188,11 +189,13 @@ func (j *Authorization) GetTokenFromHeaderAndVerify(ctx *gin.Context) (string, *
 
 func (j *Authorization) AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		_, _, err := j.GetTokenFromHeaderAndVerify(c)
+		_, claims, err := j.GetTokenFromHeaderAndVerify(c)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
+		c.Set("admin_mail", strings.TrimSpace(claims.Name))
+		c.Set("admin_id", strings.TrimSpace(claims.Subject))
 		c.Next()
 	}
 }

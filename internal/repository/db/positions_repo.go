@@ -35,17 +35,16 @@ func (p *PostgresDB) AllPositions(ctx context.Context) ([]*models.Positions, err
 
 func (p *PostgresDB) GetPositionByID(ctx context.Context, id int64) (*models.Positions, error) {
 	position := &models.Positions{}
-	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Preload("Shifts").Find(&position).Error; err != nil {
+	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Preload("Shifts").First(position).Error; err != nil {
 		return &models.Positions{}, err
 	}
-
 	return position, nil
 }
 
 func (p *PostgresDB) GetPositionByIdForEdit(ctx context.Context, id int64) (*models.Positions, error) {
 	position := &models.Positions{}
-	var usersArray []int64
-	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Preload("Shifts").Find(&position).Error; err != nil {
+	usersArray := make([]int64, 0, len(position.Users))
+	if err := p.DB.WithContext(ctx).Where("id = ?", id).Preload("Users").Preload("Shifts").First(position).Error; err != nil {
 		return &models.Positions{}, err
 	}
 

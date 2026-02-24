@@ -9,7 +9,7 @@ type Users struct {
 	NameSurname       string    `gorm:"type:text" json:"name_surname" binding:"required"`
 	Email             string    `gorm:"type:text" json:"email" binding:"required,email"`
 	Password          string    `gorm:"type:text" json:"password" binding:"required,min=8,max=32"`
-	PositionName      string    `gorm:"type:text" json:"position_name" binding:"required"`
+	PositionName      string    `gorm:"type:text;index" json:"position_name" binding:"required"`
 	Shifts            []*Shifts `gorm:"foreignKey:UserID;references:ID" json:"shifts,omitempty"`
 	CreatedAt         time.Time `gorm:"type:timestamp" json:"-"`
 	UpdatedAt         time.Time `gorm:"type:timestamp" json:"-"`

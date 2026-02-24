@@ -29,6 +29,7 @@ func (server *Server) setupRouter() {
 	var shiftsHandlers services.ShiftHandler
 	var annualLeaveHandlers services.AnnualLeaveHandler
 	var dailyScheduleHandlers services.DailyScheduleHandler
+	var dailyAssignmentsHandlers services.DailyAssignmentsHandler
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(gin.Logger())
@@ -40,6 +41,7 @@ func (server *Server) setupRouter() {
 	shiftHandler := shiftsHandlers.ShiftsHandlerConstructor()
 	annualLeaveHandler := annualLeaveHandlers.AnnualLeaveConstructor()
 	dailyScheduleHandler := dailyScheduleHandlers.DailyScheduleConstructor()
+	dailyAssignmentsHandler := dailyAssignmentsHandlers.DailyAssignmentsConstructor()
 
 	router.Use(middleware.CORSMiddleware())
 
@@ -84,6 +86,7 @@ func (server *Server) setupRouter() {
 	authRoutes.PATCH("/update-shift/:id", shiftHandler.UpdateShift)
 	authRoutes.DELETE("/delete-shift/:id", shiftHandler.DeleteShift)
 	authRoutes.PUT("/create-daily-schedule", dailyScheduleHandler.CreateDailySchedule)
+	authRoutes.POST("/daily-assignments/send", dailyAssignmentsHandler.SendToTeam)
 	//authRoutes.GET("/all-daily-schedules", dailyScheduleHandler.GetAllDailySchedules)
 
 	server.Router = router

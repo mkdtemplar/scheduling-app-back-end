@@ -15,4 +15,5 @@ type IUserInterfaces interface {
 		currentPosition string, positionId int64) (*models.Users, error)
 	Delete(ctx context.Context, id int64) error
 	GetUserIds(ctx context.Context) ([]*models.Users, error)
+	FindUsersByPositionName(positionName string) ([]models.Users, error)
 }
