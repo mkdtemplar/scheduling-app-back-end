@@ -5,6 +5,7 @@ import (
 	"errors"
 	"scheduling-app-back-end/internal/models"
 	"scheduling-app-back-end/internal/repository/interfaces"
+	"strings"
 )
 
 func NewAdminRepo() interfaces.IAdminInterfaces {
@@ -66,9 +67,14 @@ func (p *PostgresDB) GetAdminById(ctx context.Context, id int64) (*models.Admin,
 func (p *PostgresDB) UpdateAdmin(ctx context.Context, id int64, username string, password string) (*models.Admin, error) {
 	var adminForUpdate = &models.Admin{}
 
+	updates := map[string]any{"user_name": username}
+	if strings.TrimSpace(password) != "" {
+		updates["password"] = password
+	}
+
 	if err := p.DB.WithContext(ctx).Model(adminForUpdate).
 		Where("id = ?", id).
-		Updates(map[string]interface{}{"id": id, "user_name": username, "password": password}).Error; err != nil {
+		Updates(updates).Error; err != nil {
 		return &models.Admin{}, err
 	}
 	return adminForUpdate, nil

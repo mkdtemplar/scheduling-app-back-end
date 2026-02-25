@@ -45,7 +45,7 @@ type JwtUser struct {
 
 type TokenPairs struct {
 	Token        string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `json:"-"`
 }
 
 type Claims struct {
@@ -53,93 +53,129 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+func (j *Authorization) SetRefreshCookie(ctx *gin.Context, refreshToken string) {
+	secure := true
+	sameSite := http.SameSiteStrictMode
+
+	// ✅ dev/localhost: allow cookie over http
+	if j.CookieDomain == "" || strings.Contains(j.CookieDomain, "localhost") {
+		secure = false
+		sameSite = http.SameSiteLaxMode
+	}
+
+	ctx.SetSameSite(sameSite)
+	ctx.SetCookie(
+		j.CookieName,
+		refreshToken,
+		int(j.RefreshExpiry.Seconds()),
+		j.CookiePath,
+		j.CookieDomain,
+		secure,
+		true, // HttpOnly => JS cannot read cookie (good)
+	)
+}
+
 func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
+	access := jwt.New(jwt.SigningMethodHS256)
+	accessClaims := access.Claims.(jwt.MapClaims)
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = user.Username
-	claims["sub"] = strconv.Itoa(int(user.ID))
-	claims["aud"] = j.Audience
-	claims["iss"] = j.Issuer
-	claims["iat"] = time.Now().UTC().Unix()
-	claims["typ"] = "JWT"
-	claims["exp"] = time.Now().UTC().Add(j.TokenExpiry).Unix()
+	accessClaims["name"] = user.Username
+	accessClaims["sub"] = strconv.Itoa(int(user.ID))
+	accessClaims["aud"] = j.Audience
+	accessClaims["iss"] = j.Issuer
+	accessClaims["iat"] = time.Now().UTC().Unix()
+	accessClaims["typ"] = "JWT"
+	accessClaims["exp"] = time.Now().UTC().Add(j.TokenExpiry).Unix()
 
-	signedAccessToken, err := token.SignedString([]byte(j.JWTSecret))
+	signedAccessToken, err := access.SignedString([]byte(j.JWTSecret))
 	if err != nil {
 		return TokenPairs{}, err
 	}
 
-	refreshToken := jwt.New(jwt.SigningMethodHS256)
-	refreshTokenClaims := refreshToken.Claims.(jwt.MapClaims)
-	refreshTokenClaims["sub"] = strconv.Itoa(int(user.ID))
-	refreshTokenClaims["iat"] = time.Now().UTC().Unix()
-	refreshTokenClaims["ext"] = time.Now().Add(j.RefreshExpiry).UTC().Unix()
+	refresh := jwt.New(jwt.SigningMethodHS256)
+	refreshClaims := refresh.Claims.(jwt.MapClaims)
 
-	signedRefreshToken, err := refreshToken.SignedString([]byte(j.JWTSecret))
+	// Keep refresh minimal: sub + iat + exp
+	refreshClaims["sub"] = strconv.Itoa(int(user.ID))
+	refreshClaims["iat"] = time.Now().UTC().Unix()
+
+	refreshClaims["exp"] = time.Now().UTC().Add(j.RefreshExpiry).Unix()
+
+	signedRefreshToken, err := refresh.SignedString([]byte(j.JWTSecret))
 	if err != nil {
 		return TokenPairs{}, err
 	}
 
-	tokenPairs := TokenPairs{
+	return TokenPairs{
 		Token:        signedAccessToken,
 		RefreshToken: signedRefreshToken,
-	}
-
-	return tokenPairs, nil
+	}, nil
 }
 
 func (j *Authorization) GetRefreshCookie(refreshToken string, ctx *gin.Context) {
-	ctx.SetSameSite(http.SameSiteStrictMode)
-	ctx.SetCookie(j.CookieName, refreshToken, int(j.RefreshExpiry.Seconds()), j.CookiePath, j.CookieDomain, true, true)
+	secure := true
+	sameSite := http.SameSiteStrictMode
+
+	if j.CookieDomain == "" || strings.Contains(j.CookieDomain, "localhost") {
+		secure = false
+		sameSite = http.SameSiteLaxMode
+	}
+
+	ctx.SetSameSite(sameSite)
+	ctx.SetCookie(
+		j.CookieName,
+		refreshToken,
+		int(j.RefreshExpiry.Seconds()),
+		j.CookiePath,
+		j.CookieDomain,
+		secure,
+		true,
+	)
 }
 
 func (j *Authorization) RefreshToken(ctx *gin.Context) {
-	adminRepo := db.NewAdminRepo()
-	for _, cookie := range ctx.Request.Cookies() {
-		if cookie.Name == j.CookieName {
-			claims := &Claims{}
-			refreshToken := cookie.Value
-
-			_, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
-				return []byte(j.JWTSecret), nil
-			})
-			if err != nil {
-				ctx.JSON(http.StatusUnauthorized, gin.H{"error": errors.New("unauthorized")})
-				return
-			}
-
-			adminId, err := strconv.Atoi(claims.Subject)
-			if err != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{"error": errors.New("cannot parse id")})
-			}
-			admin, err := adminRepo.GetAdminById(ctx, int64(adminId))
-			if err != nil {
-				ctx.JSON(http.StatusUnauthorized, gin.H{"error": errors.New("user not found")})
-				return
-			}
-
-			u := &JwtUser{
-				ID:       admin.ID,
-				Username: admin.UserName,
-			}
-
-			tokenPairs, err := j.GenerateTokenPairs(u)
-			if err != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{"error": errors.New("cannot generate tokens")})
-				return
-			}
-
-			ctx.SetSameSite(http.SameSiteStrictMode)
-			ctx.SetCookie(j.CookieName, tokenPairs.Token, int(j.RefreshExpiry.Seconds()), j.CookiePath,
-				j.CookieDomain, true, true)
-
-			ctx.JSON(http.StatusOK, tokenPairs)
-
-		}
+	refreshToken, err := ctx.Cookie(j.CookieName)
+	if err != nil || strings.TrimSpace(refreshToken) == "" {
+		// ✅ Always respond (no silent return)
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "missing refresh cookie"})
+		return
 	}
-}
 
+	claims := &Claims{}
+	_, err = jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(j.JWTSecret), nil
+	})
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": errors.New("unauthorized").Error()})
+		return
+	}
+
+	adminID, err := strconv.Atoi(claims.Subject)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "cannot parse id"})
+		return
+	}
+
+	adminRepo := db.NewAdminRepo()
+	admin, err := adminRepo.GetAdminById(ctx, int64(adminID))
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "user not found"})
+		return
+	}
+
+	u := &JwtUser{ID: admin.ID, Username: admin.UserName}
+	tokenPairs, err := j.GenerateTokenPairs(u)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "cannot generate tokens"})
+		return
+	}
+
+	j.GetRefreshCookie(tokenPairs.RefreshToken, ctx)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"access_token": tokenPairs.Token,
+	})
+}
 func (j *Authorization) Logout(ctx *gin.Context) {
 	ctx.SetSameSite(http.SameSiteStrictMode)
 	ctx.SetCookie(j.CookieName, "", -1, j.CookiePath, j.CookieDomain, true, true)
@@ -199,27 +235,25 @@ func (j *Authorization) AuthRequired() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
 func (j *Authorization) AuthStatus(ctx *gin.Context) {
-	for _, cookie := range ctx.Request.Cookies() {
-		if cookie.Name == j.CookieName {
-			claims := &Claims{}
-			refreshToken := cookie.Value
-
-			_, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
-				return []byte(j.JWTSecret), nil
-			})
-			if err != nil {
-				ctx.JSON(http.StatusUnauthorized, gin.H{"isLoggedIn": false})
-				return
-			}
-
-			ctx.JSON(http.StatusOK, gin.H{
-				"isLoggedIn": true,
-				"userId":     claims.Subject,
-			})
-			return
-		}
+	refreshToken, err := ctx.Cookie(j.CookieName)
+	if err != nil || strings.TrimSpace(refreshToken) == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"isLoggedIn": false})
+		return
 	}
 
-	ctx.JSON(http.StatusUnauthorized, gin.H{"isLoggedIn": false})
+	claims := &Claims{}
+	_, err = jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(j.JWTSecret), nil
+	})
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"isLoggedIn": false})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"isLoggedIn": true,
+		"userId":     claims.Subject,
+	})
 }

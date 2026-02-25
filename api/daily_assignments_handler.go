@@ -14,14 +14,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var SenderEmail = ""
-
 func NewDailyAssignmentsHandler(positionsRepo interfaces.IPositionsRepository,
-	dailyRepo interfaces.IDailyAssignmentsRepository, from string) *DailyAssignmentsHandler {
+	dailyRepo interfaces.IDailyAssignmentsRepository) *DailyAssignmentsHandler {
 	return &DailyAssignmentsHandler{
 		positionsRepo: positionsRepo,
 		dailyRepo:     dailyRepo,
-		from:          from,
+		//from:          from,
 	}
 }
 
@@ -44,14 +42,13 @@ func (da *DailyAssignmentsHandler) SendToTeam(c *gin.Context) {
 		return
 	}
 
-	from := da.from
+	//from := da.from
 	senderEmail := ""
 	if v, ok := c.Get("admin_mail"); ok {
 		if s, ok2 := v.(string); ok2 {
 			senderEmail = strings.TrimSpace(s)
 		}
 	}
-	SenderEmail = senderEmail
 	positionName := req.PositionName
 	if positionName == "" && req.PositionID > 0 {
 		pos, err := da.positionsRepo.GetPositionByID(c.Request.Context(), req.PositionID)
@@ -84,7 +81,7 @@ func (da *DailyAssignmentsHandler) SendToTeam(c *gin.Context) {
 
 		err = utils.SendMsgErr(models.MailData{
 			To:      to,
-			From:    from,
+			From:    senderEmail,
 			Subject: subject,
 			Content: content,
 		})

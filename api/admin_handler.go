@@ -8,6 +8,7 @@ import (
 	"scheduling-app-back-end/internal/repository/interfaces"
 	"scheduling-app-back-end/internal/utils"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -70,7 +71,7 @@ func (adm *AdminHandler) UpdateAdmin(ctx *gin.Context) {
 		return
 	}
 
-	adminFromDb, err := adm.IAdminInterfaces.GetAdminById(ctx, int64(id))
+	_, err = adm.IAdminInterfaces.GetAdminById(ctx, int64(id))
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, errorResponse(err))
 		return
@@ -82,13 +83,32 @@ func (adm *AdminHandler) UpdateAdmin(ctx *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := utils.HashPassword(adminForEdit.Password)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	if strings.TrimSpace(adminForEdit.UserName) == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "username is required"})
 		return
 	}
 
-	adminFromDb, err = adm.IAdminInterfaces.UpdateAdmin(ctx, adminForEdit.ID, adminForEdit.UserName, hashedPassword)
+	password := strings.TrimSpace(adminForEdit.Password)
+
+	if password != "" {
+		hashedPassword, err := utils.HashPassword(password)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		adminFromDb, err := adm.IAdminInterfaces.UpdateAdmin(ctx, adminForEdit.ID, adminForEdit.UserName, hashedPassword)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		response := dto.NewAdminResponse(adminFromDb)
+		ctx.JSON(http.StatusOK, response)
+		return
+	}
+
+	adminFromDb, err := adm.IAdminInterfaces.UpdateAdmin(ctx, adminForEdit.ID, adminForEdit.UserName, "")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

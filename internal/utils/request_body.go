@@ -9,17 +9,13 @@ import (
 )
 
 func ParseUserPrefRequestBody(ctx *gin.Context) (*models.Users, error) {
-	body, err := io.ReadAll(ctx.Request.Body)
-	if err != nil {
+	user := &models.Users{}
+	dec := json.NewDecoder(ctx.Request.Body)
+	dec.DisallowUnknownFields()
+
+	if err := dec.Decode(user); err != nil {
 		return nil, err
 	}
-
-	user := &models.Users{}
-	err = json.Unmarshal(body, &user)
-	if err != nil {
-		return &models.Users{}, err
-	}
-
 	return user, nil
 }
 

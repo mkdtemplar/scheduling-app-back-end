@@ -96,7 +96,6 @@ func (p *PostgresDB) GetUserByIdForEdit(ctx context.Context, id int64) (*models.
 		ID:           user.ID,
 		NameSurname:  user.NameSurname,
 		Email:        user.Email,
-		Password:     user.Password,
 		PositionName: user.PositionName,
 		Shifts:       user.Shifts,
 		CreatedAt:    user.CreatedAt,
@@ -122,19 +121,31 @@ func (p *PostgresDB) GetUserIds(ctx context.Context) ([]*models.Users, error) {
 }
 
 func (p *PostgresDB) UpdateUser(ctx context.Context, id int64, idUpdated int64, nameSurname string, email string,
-	currentPosition string, positionId int64) (*models.Users, error) {
+	currentPosition string, positionId int64, passwordHash *string) (*models.Users, error) {
 
-	var userForUpdate = &models.Users{}
+	userForUpdate := &models.Users{}
 
-	if err := p.DB.Debug().WithContext(ctx).Model(userForUpdate).Where("id = ?", id).
-		Updates(map[string]interface{}{"id": idUpdated, "name_surname": nameSurname, "email": email,
-			"position_name": currentPosition, "user_id": positionId}).Error; err != nil {
+	updates := map[string]interface{}{
+		"id":            idUpdated,
+		"name_surname":  nameSurname,
+		"email":         email,
+		"position_name": currentPosition,
+		"user_id":       positionId,
+	}
+
+	if passwordHash != nil && *passwordHash != "" {
+		updates["password"] = *passwordHash
+	}
+
+	if err := p.DB.WithContext(ctx).
+		Model(userForUpdate).
+		Where("id = ?", id).
+		Updates(updates).Error; err != nil {
 		return &models.Users{}, err
 	}
 
 	return userForUpdate, nil
 }
-
 func (p *PostgresDB) Delete(ctx context.Context, id int64) error {
 	var err error
 

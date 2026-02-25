@@ -6,7 +6,6 @@ import (
 	"scheduling-app-back-end/internal/middleware"
 	"scheduling-app-back-end/internal/repository/db"
 	"scheduling-app-back-end/internal/utils"
-	"strings"
 )
 
 type AdminHandler api.AdminHandler
@@ -59,10 +58,6 @@ func (h *DailyAssignmentsHandler) DailyAssignmentsConstructor() *api.DailyAssign
 
 	positionRepo := db.NewPositionRepo()
 	dailyRepo := db.NewDailyAssignmentsRepo()
-	from := strings.TrimSpace(api.SenderEmail)
-	if from == "" {
-		from = "Scheduling App <no-reply@scheduling.local>"
-	}
 
-	return api.NewDailyAssignmentsHandler(positionRepo, dailyRepo, from)
+	return api.NewDailyAssignmentsHandler(positionRepo, dailyRepo)
 }

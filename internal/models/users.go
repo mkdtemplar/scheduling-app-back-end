@@ -5,10 +5,10 @@ import (
 )
 
 type Users struct {
-	ID                int64     `gorm:"type:bigint;primaryKey" json:"id" binding:"required"`
+	ID                int64     `gorm:"type:bigint;primaryKey" json:"id"`
 	NameSurname       string    `gorm:"type:text" json:"name_surname" binding:"required"`
 	Email             string    `gorm:"type:text" json:"email" binding:"required,email"`
-	Password          string    `gorm:"type:text" json:"password" binding:"required,min=8,max=32"`
+	Password          string    `gorm:"type:text" json:"password" binding:"omitempty,min=8,max=32"` // ✅ optional
 	PositionName      string    `gorm:"type:text;index" json:"position_name" binding:"required"`
 	Shifts            []*Shifts `gorm:"foreignKey:UserID;references:ID" json:"shifts,omitempty"`
 	CreatedAt         time.Time `gorm:"type:timestamp" json:"-"`

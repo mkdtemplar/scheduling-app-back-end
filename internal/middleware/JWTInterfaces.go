@@ -12,4 +12,5 @@ type IJWTInterfaces interface {
 	GetTokenFromHeaderAndVerify(ctx *gin.Context) (string, *Claims, error)
 	AuthRequired() gin.HandlerFunc
 	AuthStatus(ctx *gin.Context)
+	SetRefreshCookie(ctx *gin.Context, refreshToken string)
 }

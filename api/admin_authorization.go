@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"scheduling-app-back-end/internal/middleware"
 	"scheduling-app-back-end/internal/utils"
@@ -12,53 +11,48 @@ import (
 )
 
 func (adm *AdminHandler) Authorization(ctx *gin.Context) {
-
 	var requestPayload struct {
-		Username string `json:"user_name" binding:"required" gorm:"type:email"`
-		Password string `json:"password" binding:"required" gorm:"type:password"`
+		Username string `json:"user_name" binding:"required,email"`
+		Password string `json:"password" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindJSON(&requestPayload); err != nil {
-		if requestPayload.Username == "" || requestPayload.Password == "" {
-			ctx.JSON(http.StatusBadRequest, errorResponse(errors.New("username or password is empty")))
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	fmt.Println(requestPayload.Username, requestPayload.Password)
-
 	adminByEmail, err := adm.IAdminInterfaces.GetAdminByEmail(ctx, requestPayload.Username)
-	fmt.Println(adminByEmail)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("invalid credentials")))
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	valid, err := utils.CheckPassword(requestPayload.Password, adminByEmail.Password)
 	if err != nil || !valid {
-		ctx.JSON(http.StatusBadRequest, errorResponse(errors.New("invalid credentials")))
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
 
-	testUser := middleware.JwtUser{
+	user := middleware.JwtUser{
 		ID:       adminByEmail.ID,
 		Username: adminByEmail.UserName,
 	}
 
-	tokens, err := adm.IJWTInterfaces.GenerateTokenPairs(&testUser)
+	tokens, err := adm.IJWTInterfaces.GenerateTokenPairs(&user)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("invalid credentials")))
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "cannot generate tokens"})
 		return
 	}
 
-	adm.IJWTInterfaces.GetRefreshCookie(tokens.Token, ctx)
+	// ✅ FIX: store REFRESH token in cookie (NOT access token)
+	adm.IJWTInterfaces.GetRefreshCookie(tokens.RefreshToken, ctx)
 
-	ctx.JSON(http.StatusAccepted, tokens)
-
+	// ✅ Return only access token to frontend
+	ctx.JSON(http.StatusOK, gin.H{
+		"access_token": tokens.Token,
+	})
 }

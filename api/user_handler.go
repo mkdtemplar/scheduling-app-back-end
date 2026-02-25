@@ -7,6 +7,7 @@ import (
 	"scheduling-app-back-end/internal/repository/interfaces"
 	"scheduling-app-back-end/internal/utils"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -125,18 +126,32 @@ func (usr *UserHandler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	userUpdated, err := usr.IUserInterfaces.UpdateUser(ctx, userFromDb.ID, userForEdit.ID, userForEdit.NameSurname,
-		userForEdit.Email, userForEdit.PositionName, userForEdit.UserID)
+	var passwordHash *string = nil
+	if strings.TrimSpace(userForEdit.Password) != "" {
+		hashed, err := utils.HashPassword(userForEdit.Password)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		passwordHash = &hashed
+	}
 
+	userUpdated, err := usr.IUserInterfaces.UpdateUser(
+		ctx,
+		userFromDb.ID,
+		userForEdit.ID,
+		userForEdit.NameSurname,
+		userForEdit.Email,
+		userForEdit.PositionName,
+		userForEdit.UserID,
+		passwordHash,
+	)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	response := dto.NewUserResponse(userUpdated)
-
-	ctx.JSON(http.StatusOK, response)
-
+	ctx.JSON(http.StatusOK, dto.NewUserResponse(userUpdated))
 }
 
 func (usr *UserHandler) GetUserIds(ctx *gin.Context) {
