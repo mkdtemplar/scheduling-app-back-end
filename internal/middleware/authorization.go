@@ -57,7 +57,6 @@ func (j *Authorization) SetRefreshCookie(ctx *gin.Context, refreshToken string) 
 	secure := true
 	sameSite := http.SameSiteStrictMode
 
-	// ✅ dev/localhost: allow cookie over http
 	if j.CookieDomain == "" || strings.Contains(j.CookieDomain, "localhost") {
 		secure = false
 		sameSite = http.SameSiteLaxMode
@@ -71,7 +70,7 @@ func (j *Authorization) SetRefreshCookie(ctx *gin.Context, refreshToken string) 
 		j.CookiePath,
 		j.CookieDomain,
 		secure,
-		true, // HttpOnly => JS cannot read cookie (good)
+		true,
 	)
 }
 
@@ -95,7 +94,6 @@ func (j *Authorization) GenerateTokenPairs(user *JwtUser) (TokenPairs, error) {
 	refresh := jwt.New(jwt.SigningMethodHS256)
 	refreshClaims := refresh.Claims.(jwt.MapClaims)
 
-	// Keep refresh minimal: sub + iat + exp
 	refreshClaims["sub"] = strconv.Itoa(int(user.ID))
 	refreshClaims["iat"] = time.Now().UTC().Unix()
 

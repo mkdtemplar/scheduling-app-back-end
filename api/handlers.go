@@ -45,5 +45,4 @@ type DailyAssignmentsHandler struct {
 	Handler
 	positionsRepo interfaces.IPositionsRepository
 	dailyRepo     interfaces.IDailyAssignmentsRepository
-	//from          string
 }

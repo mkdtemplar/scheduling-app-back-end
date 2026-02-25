@@ -48,10 +48,8 @@ func (adm *AdminHandler) Authorization(ctx *gin.Context) {
 		return
 	}
 
-	// ✅ FIX: store REFRESH token in cookie (NOT access token)
 	adm.IJWTInterfaces.GetRefreshCookie(tokens.RefreshToken, ctx)
 
-	// ✅ Return only access token to frontend
 	ctx.JSON(http.StatusOK, gin.H{
 		"access_token": tokens.Token,
 	})
